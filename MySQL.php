@@ -7,18 +7,18 @@
 class MySQL implements Database
 {
 
-    //check page 196 in php cookbook. Maybe add a query or dbh parameter
+    protected  $dbh;
 
-    public function __construct()
-    {
+    public function __construct(){
     }
 
-    public function connect()
-    {
+    public function connect(){
+        $this->dbh = new mysqli(AppConfig::getConnection(), AppConfig::getUsername(),
+                                AppConfig::getPassword(), AppConfig::getTable());
     }
 
-    public function disconnect()
-    {
+    public function disconnect(){
+        $this->dbh->close();
     }
 
     public function insert()

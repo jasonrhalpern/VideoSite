@@ -8,8 +8,10 @@ class User extends Person
 
     protected $joined; //date
 
-    public function __construct()
-    {
+    public function __construct($name, $email, $username, $id, $password){
+
+        parent::__construct($name, $email, $username, $id, $password);
+        $this->joined = DateHelper::currentDate();
     }
 
     public function getJoined()
