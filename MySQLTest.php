@@ -3,6 +3,7 @@
  * @author Jason Halpern
  */
 
+require_once 'PHPUnit/Autoload.php';
 require_once('MySQL.php');
 
 class MySQLTest extends PHPUnit_Framework_TestCase
