@@ -67,7 +67,7 @@ class MySQL implements Database
         $query->close();
 
         /* check if successful */
-        if($querySuccess !== 0){
+        if($querySuccess !== -1){
             return true;
         }
         else{
