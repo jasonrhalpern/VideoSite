@@ -4,6 +4,9 @@
  * @author Jason Halpern
  */
 
+require_once('/home/simawatkinto/AppConfig.php');
+require_once('Database.php');
+
 class MySQL implements Database
 {
 
@@ -15,6 +18,13 @@ class MySQL implements Database
     public function connect(){
         $this->dbh = new mysqli(AppConfig::getConnection(), AppConfig::getUsername(),
                                 AppConfig::getPassword(), AppConfig::getTable());
+
+        if($this->dbh){
+           return true;
+        }
+        else{
+            return false;
+        }
     }
 
     public function disconnect(){

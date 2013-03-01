@@ -3,8 +3,7 @@
  * @author Jason Halpern
  */
 
-class User extends Person
-{
+class User extends Person{
 
     protected $joined; //date
 
