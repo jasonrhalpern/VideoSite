@@ -4,7 +4,7 @@
  */
 
 require_once 'PHPUnit/Autoload.php';
-require_once('MySQL.php');
+require_once dirname(__FILE__) . '/../MySQL.php';
 
 class MySQLTest extends PHPUnit_Framework_TestCase
 {
