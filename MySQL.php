@@ -55,11 +55,11 @@ class MySQL implements Database
         $query->bind_param("isssss", $temp_id, $newUser->getUsername(), $newUser->getName(), $newUser->getEmail(),
                                      $newUser->getEncryptedPassword(), $date);
 
-        return $this->isQuerySuccessful($query);
+        return $this->isExecuted($query);
 
     }
 
-    public function isQuerySuccessful($query){
+    public function isExecuted($query){
 
         $query->execute();
         $query->store_result();
