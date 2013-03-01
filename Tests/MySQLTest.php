@@ -20,6 +20,6 @@ class MySQLTest extends PHPUnit_Framework_TestCase
     public function testConnect()
     {
         $testConnection = new MySQL();
-        $this->assertTrue($testConnection->connect(), true);
+        $this->assertTrue($testConnection->isConnected());
     }
 }

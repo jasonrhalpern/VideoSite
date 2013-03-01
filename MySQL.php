@@ -13,14 +13,24 @@ class MySQL implements Database
     protected  $dbh;
 
     public function __construct(){
+        $this->connect();
+    }
+
+    public function __destruct() {
+        $this->disconnect();
     }
 
     public function connect(){
         $this->dbh = new mysqli(AppConfig::getConnection(), AppConfig::getUsername(),
                                 AppConfig::getPassword(), AppConfig::getTable());
 
+    }
+
+    public function isConnected(){
+
+        //make sure we are connected to the database
         if($this->dbh){
-           return true;
+            return true;
         }
         else{
             return false;
