@@ -3,6 +3,9 @@
  * @author Jason Halpern
  */
 
+require_once('Person.php');
+require_once('DateHelper.php');
+
 class User extends Person{
 
     protected $joined; //date
@@ -13,8 +16,7 @@ class User extends Person{
         $this->joined = DateHelper::currentDate();
     }
 
-    public function getJoined()
-    {
+    public function getJoined(){
         return $this->joined;
     }
 

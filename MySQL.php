@@ -46,6 +46,35 @@ class MySQL implements Database
         //should take parameters and table, might need several insert functions based on table
     }
 
+    public function insertUser($newUser){
+
+        $date = DateHelper::currentDate();
+        $temp_id = 0;
+
+        $query = $this->dbh->prepare("insert into users values(?, ?, ?, ?, ?, ?)");
+        $query->bind_param("isssss", $temp_id, $newUser->getUsername(), $newUser->getName(), $newUser->getEmail(),
+                                     $newUser->getEncryptedPassword(), $date);
+
+        return $this->isQuerySuccessful($query);
+
+    }
+
+    public function isQuerySuccessful($query){
+
+        $query->execute();
+        $query->store_result();
+        $querySuccess = $query->affected_rows;
+        $query->close();
+
+        /* check if successful */
+        if($querySuccess !== 0){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
     public function select()
     {
         //need parameters and table name, might need to tweak this based on # of params

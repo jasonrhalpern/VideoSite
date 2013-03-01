@@ -29,19 +29,9 @@ abstract class Person
         return $this->email;
     }
 
-    public function setEmail($newEmail)
-    {
-        $this->email = $newEmail;
-    }
-
     public function getId()
     {
         return $this->id;
-    }
-
-    public function setId($newId)
-    {
-        $this->id = $newId;
     }
 
     public function getUsername()
@@ -49,14 +39,32 @@ abstract class Person
         return $this->username;
     }
 
-    public function setUsername($newUsername)
-    {
-        $this->username = $newUsername;
-    }
-
     public function getPassword()
     {
         return $this->password;
+    }
+
+    public function getEncryptedPassword(){
+        $salt = AppConfig::getSalt();
+        $password = strtolower($this->getPassword());
+        $encrypted_password = md5($salt.$password);
+
+        return $encrypted_password;
+    }
+
+    public function setEmail($newEmail)
+    {
+        $this->email = $newEmail;
+    }
+
+    public function setId($newId)
+    {
+        $this->id = $newId;
+    }
+
+    public function setUsername($newUsername)
+    {
+        $this->username = $newUsername;
     }
 
     public function setPassword($newPassword)
