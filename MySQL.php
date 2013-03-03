@@ -7,8 +7,7 @@
 require_once('/home/simawatkinto/AppConfig.php');
 require_once('Database.php');
 
-class MySQL implements Database
-{
+class MySQL implements Database{
 
     protected  $dbh;
 
@@ -17,13 +16,17 @@ class MySQL implements Database
     }
 
     public function __destruct() {
-        $this->disconnect();
+        $this->dbh->close();
     }
 
     public function connect(){
         $this->dbh = new mysqli(AppConfig::getConnection(), AppConfig::getUsername(),
                                 AppConfig::getPassword(), AppConfig::getTable());
 
+    }
+
+    public function getDBConnection(){
+        return $this->dbh;
     }
 
     public function isConnected(){
@@ -41,12 +44,17 @@ class MySQL implements Database
         $this->dbh->close();
     }
 
-    public function insert()
-    {
-        //should take parameters and table, might need several insert functions based on table
+    public function insert(){
+
     }
 
     public function insertUser($newUser){
+
+        if($newUser->hasDuplicateEmail())
+               return false;
+
+        if($newUser->hasDuplicateUsername())
+            return false;
 
         $date = DateHelper::currentDate();
         $temp_id = 0;
@@ -57,6 +65,36 @@ class MySQL implements Database
 
         return $this->isExecuted($query);
 
+    }
+
+    public function deleteUser($user){
+
+        $query = $this->dbh->prepare("delete from users where username=?");
+        $query->bind_param("s", $user->getUsername());
+
+        return $this->isExecuted($query);
+    }
+
+    public function userExists($user){
+        $query = $this->dbh->prepare("select * from users where email = ? and password = ?");
+        $query->bind_param("ss", $user->getEmail(), $user->getEncryptedPassword());
+
+        return $this->dataExists($query);
+    }
+
+    public function dataExists($query){
+        $query->execute();
+        $query->store_result();
+        $dataExists = $query->num_rows;
+        $query->close();
+
+        /* check if this data already exists in the database */
+        if($dataExists > 0){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 
     public function isExecuted($query){

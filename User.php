@@ -16,6 +16,25 @@ class User extends Person{
         $this->joined = DateHelper::currentDate();
     }
 
+    public function login(){
+        return $this->db->userExists($this);
+    }
+
+    public function hasDuplicateEmail(){
+        $query = $this->getDBConnection()->prepare("select * from users where email = ?");
+        $query->bind_param("s", $this->getEmail());
+
+        return $this->db->dataExists($query);
+    }
+
+    public function hasDuplicateUsername(){
+        $query = $this->getDBConnection()->prepare("select * from users where username = ?");
+        $query->bind_param("s", $this->getUsername());
+
+        return $this->db->dataExists($query);
+
+    }
+
     public function getJoined(){
         return $this->joined;
     }

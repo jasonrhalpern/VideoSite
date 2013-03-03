@@ -10,6 +10,7 @@ abstract class Person
     protected $username;
     protected $id;
     protected $password;
+    protected $db;
 
     public function __construct($name, $email, $username, $id, $password){
         $this->name = $name;
@@ -17,6 +18,7 @@ abstract class Person
         $this->username = $username;
         $this->id = $id;
         $this->password = $password;
+        $this->db = new MySQL();
     }
 
     public function getName()
@@ -42,6 +44,10 @@ abstract class Person
     public function getPassword()
     {
         return $this->password;
+    }
+
+    public function getDBConnection(){
+        return $this->db->getDBConnection();
     }
 
     public function getEncryptedPassword(){
