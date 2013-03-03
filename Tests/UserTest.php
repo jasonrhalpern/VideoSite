@@ -43,4 +43,16 @@ class UserTest extends PHPUnit_Framework_TestCase{
         $this->assertFalse($this->userTwo->hasDuplicateUsername());
         $this->assertTrue($this->userThree->hasDuplicateUsername());
     }
+
+    public function testLoadUser(){
+        $this->assertTrue($this->dbConnection->insertUser($this->userOne));
+        $user = User::loadUser($this->userOne->getEmail(), $this->userOne->getPassword());
+        $this->assertEquals($user->getEmail(), 'georgeie10@aol.com');
+        $this->assertEquals($user->getUsername(), 'GMoney89');
+        $this->assertEquals($user->getName(), 'Don Gangsta');
+        $this->assertEquals($user->getJoined(), DateHelper::currentDate());
+
+        $failedUser = User::loadUser("bagadfasdf", "asdasdawnnosdfp");
+        $this->assertFalse($failedUser);
+    }
 }

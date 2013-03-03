@@ -20,6 +20,35 @@ class User extends Person{
         return $this->db->userExists($this);
     }
 
+    public static function loadUser($email, $password){
+
+        $user = new User(null, null, null, null, null);
+        $user->setEmail($email);
+        $user->setPassword($password);
+
+        if($user->login()){
+            $user->loadDetails();
+            return $user;
+        }
+        else{
+            return false;
+        }
+
+    }
+
+    public function loadDetails(){
+        $query = $this->getDBConnection()->prepare("select * from users where email = ? and password = ?");
+        $query->bind_param("ss", $this->getEmail(), $this->getEncryptedPassword());
+        $query->execute();
+        $query->bind_result($id, $username, $name, $email, $password, $joined);
+        if($query->fetch()){
+            $this->setId($id);
+            $this->setUsername($username);
+            $this->setName($name);
+            $this->setJoined($joined);
+        }
+    }
+
     public function hasDuplicateEmail(){
         $query = $this->getDBConnection()->prepare("select * from users where email = ?");
         $query->bind_param("s", $this->getEmail());
@@ -36,7 +65,12 @@ class User extends Person{
     }
 
     public function getJoined(){
+
         return $this->joined;
+    }
+
+    public function setJoined($date){
+        $this->joined = $date;
     }
 
     public function changeUsername()

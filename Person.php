@@ -73,6 +73,10 @@ abstract class Person
         $this->username = $newUsername;
     }
 
+    public function setName($name){
+        $this->name = $name;
+    }
+
     public function setPassword($newPassword)
     {
         $this->password = $newPassword;
