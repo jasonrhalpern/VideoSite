@@ -16,17 +16,17 @@ class User extends Person{
         $this->joined = DateHelper::currentDate();
     }
 
-    public function login(){
+    public function isRegistered(){
         return $this->db->userExists($this);
     }
 
-    public static function loadUser($email, $password){
+    public static function login($email, $password){
 
         $user = new User(null, null, null, null, null);
         $user->setEmail($email);
         $user->setPassword($password);
 
-        if($user->login()){
+        if($user->isRegistered()){
             $user->loadDetails();
             return $user;
         }

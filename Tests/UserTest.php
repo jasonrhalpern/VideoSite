@@ -25,10 +25,10 @@ class UserTest extends PHPUnit_Framework_TestCase{
         $this->dbConnection->deleteUser($this->userOne);
     }
 
-    public function testLogin(){
+    public function testIsRegistered(){
         $this->assertTrue($this->dbConnection->insertUser($this->userOne));
-        $this->assertTrue($this->userOne->login());
-        $this->assertFalse($this->userTwo->login());
+        $this->assertTrue($this->userOne->isRegistered());
+        $this->assertFalse($this->userTwo->isRegistered());
     }
 
     public function testHasDuplicateEmail(){
@@ -44,15 +44,15 @@ class UserTest extends PHPUnit_Framework_TestCase{
         $this->assertTrue($this->userThree->hasDuplicateUsername());
     }
 
-    public function testLoadUser(){
+    public function testLogin(){
         $this->assertTrue($this->dbConnection->insertUser($this->userOne));
-        $user = User::loadUser($this->userOne->getEmail(), $this->userOne->getPassword());
+        $user = User::login($this->userOne->getEmail(), $this->userOne->getPassword());
         $this->assertEquals($user->getEmail(), 'georgeie10@aol.com');
         $this->assertEquals($user->getUsername(), 'GMoney89');
         $this->assertEquals($user->getName(), 'Don Gangsta');
         $this->assertEquals($user->getJoined(), DateHelper::currentDate());
 
-        $failedUser = User::loadUser("bagadfasdf", "asdasdawnnosdfp");
-        $this->assertFalse($failedUser);
+        $failedLogin = User::login("bagadfasdf", "asdasdawnnosdfp");
+        $this->assertFalse($failedLogin);
     }
 }
