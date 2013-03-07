@@ -9,19 +9,18 @@ require_once dirname(__FILE__) . '/../User.php';
 
 class MySQLTest extends PHPUnit_Framework_TestCase{
     protected $user;
-    protected $dupeEmail;
-    protected $dupeUsername;
     protected $dbConnection;
 
     public function setUp(){
-        $this->user = new User('Jason HollaBack', 'jasonrhalpern@gmail.com', 'JPern67', 1, 'sailor');
-        $this->dupeEmail = new User('Stanley', 'jasonrhalpern@gmail.com', 'Willyz', 1, 'sailor1');
-        $this->dupeUsername = new User('Jason HollaBack', 'tom@gmail.com', 'JPern67', 1, 'sailor2');
+        $this->user = new User('Jason HollaBack', 'jasonrhalpern@gmail.com', 'JzPern67', 1, 'sailor');
         $this->dbConnection = new MySQL();
     }
 
     public function tearDown(){
         $this->dbConnection->deleteUser($this->user);
+
+        unset($this->user);
+        unset($this->dbConnection);
     }
 
     public function testConnect(){
@@ -30,7 +29,10 @@ class MySQLTest extends PHPUnit_Framework_TestCase{
 
     public function testInsertUser(){
         $this->assertTrue($this->dbConnection->insertUser($this->user));
-        $this->assertFalse($this->dbConnection->insertUser($this->dupeEmail));
-        $this->assertFalse($this->dbConnection->insertUser($this->dupeUsername));
+    }
+
+    public function testUserExists(){
+        $this->assertTrue($this->dbConnection->insertUser($this->user));
+        $this->assertTrue($this->dbConnection->userExists($this->user));
     }
 }

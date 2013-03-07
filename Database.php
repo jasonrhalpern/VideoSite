@@ -10,13 +10,20 @@ interface Database
 
     public function disconnect();
 
-    public function insert();
+    public function getDBConnection();
 
-    public function select();
+    public function isConnected();
 
-    public function delete();
+    public function insertUser($user);
 
-    public function update();
+    public function deleteUser($user);
+
+    public function userExists($user);
+
+    public function dataExists($query);
+
+    public function isExecuted($query);
+
 }
 
 ?>

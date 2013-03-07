@@ -22,7 +22,6 @@ class MySQL implements Database{
     public function connect(){
         $this->dbh = new mysqli(AppConfig::getConnection(), AppConfig::getUsername(),
                                 AppConfig::getPassword(), AppConfig::getTable());
-
     }
 
     public function getDBConnection(){
@@ -44,17 +43,12 @@ class MySQL implements Database{
         $this->dbh->close();
     }
 
-    public function insert(){
 
-    }
-
+    /*
+     * add the user to the database, but check the details first to make sure a user
+     * with this information doesn't already exist
+     */
     public function insertUser($newUser){
-
-        if($newUser->hasDuplicateEmail())
-               return false;
-
-        if($newUser->hasDuplicateUsername())
-            return false;
 
         $date = DateHelper::currentDate();
         $temp_id = 0;
@@ -67,6 +61,7 @@ class MySQL implements Database{
 
     }
 
+    /* delete a user from the database */
     public function deleteUser($user){
 
         $query = $this->dbh->prepare("delete from users where username=?");
@@ -75,6 +70,7 @@ class MySQL implements Database{
         return $this->isExecuted($query);
     }
 
+    /* check if a user exists with the given email and password */
     public function userExists($user){
         $query = $this->dbh->prepare("select * from users where email = ? and password = ?");
         $query->bind_param("ss", $user->getEmail(), $user->getEncryptedPassword());
@@ -82,6 +78,7 @@ class MySQL implements Database{
         return $this->dataExists($query);
     }
 
+    /* check if our database query returned any results */
     public function dataExists($query){
         $query->execute();
         $query->store_result();
@@ -97,6 +94,7 @@ class MySQL implements Database{
         }
     }
 
+    /* check if the query was successfully executed */
     public function isExecuted($query){
 
         $query->execute();
@@ -113,18 +111,7 @@ class MySQL implements Database{
         }
     }
 
-    public function select()
-    {
-        //need parameters and table name, might need to tweak this based on # of params
-    }
 
-    public function delete()
-    {
-    }
-
-    public function update()
-    {
-    }
 }
 
 ?>
