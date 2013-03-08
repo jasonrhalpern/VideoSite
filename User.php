@@ -5,6 +5,8 @@
 
 require_once('Person.php');
 require_once('DateHelper.php');
+require_once('HelperFunc.php');
+require_once('MySQL.php');
 
 class User extends Person{
 
@@ -77,6 +79,7 @@ class User extends Person{
 
     /* check if this user is trying to register with a username already in the system */
     public function hasDuplicateUsername(){
+
         $query = $this->getDBConnection()->prepare("select * from users where username = ?");
         $query->bind_param("s", $this->getUsername());
 
@@ -113,8 +116,51 @@ class User extends Person{
         $this->joined = $date;
     }
 
-    public function changeUsername()
-    {
+    public function changeUsername($newUsername){
+
+        /* change the username to the new one, but save the old one */
+        $oldUsername = $this->getUsername();
+        $this->setUsername($newUsername);
+
+        /* only allow the username change if the user is registered and the username is unique */
+        if($this->isRegistered() && !$this->hasDuplicateUsername()){
+
+            $query = $this->getDBConnection()->prepare("UPDATE users SET username=? where email=?");
+            $query->bind_param("ss", $newUsername, $this->getEmail());
+
+            /* make sure the username has been updated in the database*/
+            if($this->db->isExecuted($query)){
+                return true;
+            }
+        }
+
+        /* username has not been updated, reset it to the old one */
+        $this->setUsername($oldUsername);
+        return false;
+    }
+
+    public function changePassword($newPassword){
+
+        /* only change the password if this user has already registered in our database */
+        if($this->isRegistered()){
+            $this->setPassword($newPassword);
+            $query = $this->getDBConnection()->prepare("UPDATE users SET password=? where email=?");
+            $query->bind_param("ss", $this->getEncryptedPassword(), $this->getEmail());
+
+            /* make sure the password has been updated */
+            if($this->db->isExecuted($query))
+                return true;
+        }
+
+        return false;
+    }
+
+    public function resetPassword(){
+
+        $newPassword = HelperFunc::generateRandomPassword();
+
+        if($this->changePassword($newPassword))
+            return $this->getPassword();
     }
 
     public function suggestCompetition()

@@ -12,6 +12,7 @@ class Series extends Production
     protected $actors; //array
     protected $started; //date
     protected $seasons; //number of seasons
+    protected $category; //comedy, drama, etc.
 
     public function __construct()
     {
@@ -47,6 +48,14 @@ class Series extends Production
 
     public function setActors()
     {
+    }
+
+    public function getCategory(){
+
+    }
+
+    public function setCategory(){
+
     }
 
     public function createNewSeason()

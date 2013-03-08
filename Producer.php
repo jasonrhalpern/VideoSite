@@ -46,6 +46,10 @@ class Producer extends User
     {
     }
 
+    public function editSeriesProducers()
+    {
+    }
+
 }
 
 ?>

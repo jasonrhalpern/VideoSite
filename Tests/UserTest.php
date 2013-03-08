@@ -69,6 +69,12 @@ class UserTest extends PHPUnit_Framework_TestCase{
         $failedLogin = User::login("bagadfasdf", "asdasdawnnosdfp");
         $this->assertFalse($failedLogin);
 
+        $failedLoginTwo = User::login($user->getEmail(), 'tedie');
+        $this->assertFalse($failedLoginTwo);
+
+        $failedLoginThree = User::login('georgeie10@aol.com', $user->getPassword());
+        $this->assertFalse($failedLoginThree);
+
         $this->dbConnection->deleteUser($this->userOne);
     }
 
@@ -81,8 +87,64 @@ class UserTest extends PHPUnit_Framework_TestCase{
         $this->assertFalse($this->userOne->register());
         $this->assertFalse($this->userFive->register());
 
+        $loggedIn = User::login($this->userThree->getEmail(), $this->userThree->getPassword());
+        $this->assertContainsOnlyInstancesOf('User', array($loggedIn));
+
+
         $this->dbConnection->deleteUser($this->userFour);
         $this->dbConnection->deleteUser($this->userThree);
+    }
+
+    public function testChangeUsername(){
+        $one = new User('Donope Gangsta', 'dan@aol.com', 'GMoney589', 1, 'tanya');
+        $this->assertTrue($one->register());
+        $this->assertTrue($one->changeUsername('Jameson Jones11'));
+        $loggedInOne = User::login($one->getEmail(), $one->getPassword());
+        $this->assertEquals($loggedInOne->getUsername(), 'Jameson Jones11');
+
+        $two = new User('Stevance Dominque1', 'steveie.domzz@yahoo.com', 'StevieDomzz1', 1, 'tanya');
+        $this->assertTrue($two->register());
+        $this->assertFalse($two->changeUsername('Jameson Jones11'));
+        $this->assertTrue($two->changeUsername('Pinkus Maximum 7'));
+
+        $this->dbConnection->deleteUser($one);
+        $this->dbConnection->deleteUser($two);
+
+    }
+
+    public function testChangePassword(){
+        $one = new User('Donope Gangsta', 'danny@aol.com', 'GMoney5897', 1, 'tanya');
+        $this->assertTrue($one->register());
+        $this->assertTrue($one->changePassword('simeon'));
+        $this->assertEquals($one->getPassword(), 'simeon');
+        $loggedInOne = User::login($one->getEmail(), 'simeon');
+        $this->assertEquals($loggedInOne->getUsername(), 'GMoney5897');
+        $this->assertEquals($loggedInOne->getPassword(), 'simeon');
+        $this->assertEquals($loggedInOne->getEmail(), 'danny@aol.com');
+        $this->dbConnection->deleteUser($one);
+
+        $two = new User('Stevance Dominque1', 'steveie.willieez@yahoo.com', 'StevieWillz12', 1, 'tanya');
+        $this->assertFalse($two->changePassword('wow'));
+    }
+
+    public function testResetPassword(){
+        $one = new User('Donope Gangsta', 'tornaldz3@aol.com', 'GMoney6612', 1, 'tanya');
+        $this->assertTrue($one->register());
+        $oldPassword = $one->getPassword();
+        $newPassword = $one->resetPassword();
+        $failedLogin = User::login($one->getEmail(), $oldPassword);
+        $this->assertFalse($failedLogin);
+
+        $loggedIn = User::login($one->getEmail(), $one->getPassword());
+        $this->assertEquals($loggedIn->getUsername(), 'GMoney6612');
+        $this->assertEquals($loggedIn->getPassword(), $newPassword);
+        $this->assertEquals($loggedIn->getName(), 'Donope Gangsta');
+        $this->assertEquals($loggedIn->getEmail(), 'tornaldz3@aol.com');
+        $this->dbConnection->deleteUser($one);
+
+        $two = new User('Stevance Dominque1', 'steveie.domzz@yahoo.com', 'StevieDomzz1', 1, 'tanya');
+        $this->assertFalse($two->changePassword('wow'));
+
     }
 
     public function testHasValidEmail(){
