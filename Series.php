@@ -29,6 +29,10 @@ class Series extends Production
 
     }
 
+    public static function loadSeriesByTitle($seriesTitle){
+        
+    }
+
     public function getCreated(){
         return $this->created;
     }
