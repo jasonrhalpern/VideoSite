@@ -79,6 +79,9 @@ class MySQL implements Database{
 
     public function insertSeries($series){
 
+        if($this->seriesExists($series))
+            return false;
+
         $temp_id = 0;
 
         $query = $this->dbh->prepare("insert into series values(?, ?, ?, ?, ?, ?, ?)");
@@ -95,8 +98,12 @@ class MySQL implements Database{
         return $this->isExecuted($query);
     }
 
+    /* check if a series with this title already exists */
     public function seriesExists($series){
+        $query = $this->dbh->prepare("select * from series where title = ?");
+        $query->bind_param("s", $series->getTitle());
 
+        return $this->dataExists($query);
     }
 
     /* check if our database query returned any results */

@@ -44,5 +44,9 @@ class MySQLTest extends PHPUnit_Framework_TestCase{
 
     public function testInsertSeries(){
         $this->assertTrue($this->dbConnection->insertSeries($this->series));
+
+        $failedSeries = new Series(1, 'The Crazies Are Out', 'Crazies just going crazy',
+                                    'Mystery/Suspense', 1);
+        $this->assertFalse($this->dbConnection->insertSeries($failedSeries));
     }
 }
