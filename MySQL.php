@@ -50,12 +50,11 @@ class MySQL implements Database{
      */
     public function insertUser($newUser){
 
-        $date = DateHelper::currentDate();
         $temp_id = 0;
 
         $query = $this->dbh->prepare("insert into users values(?, ?, ?, ?, ?, ?)");
         $query->bind_param("isssss", $temp_id, $newUser->getUsername(), $newUser->getName(), $newUser->getEmail(),
-                                     $newUser->getEncryptedPassword(), $date);
+                                     $newUser->getEncryptedPassword(), $newUser->getJoined());
 
         return $this->isExecuted($query);
 
@@ -76,6 +75,28 @@ class MySQL implements Database{
         $query->bind_param("ss", $user->getEmail(), $user->getEncryptedPassword());
 
         return $this->dataExists($query);
+    }
+
+    public function insertSeries($series){
+
+        $temp_id = 0;
+
+        $query = $this->dbh->prepare("insert into series values(?, ?, ?, ?, ?, ?, ?)");
+        $query->bind_param("iisisss", $temp_id, $series->getCreatorId(), $series->getCreated(),
+                    $series->getSeasonNum(), $series->getTitle(), $series->getDescription(), $series->getCategory());
+
+        return $this->isExecuted($query);
+    }
+
+    public function deleteSeries($series){
+        $query = $this->dbh->prepare("delete from series where title=?");
+        $query->bind_param("s", $series->getTitle());
+
+        return $this->isExecuted($query);
+    }
+
+    public function seriesExists($series){
+
     }
 
     /* check if our database query returned any results */

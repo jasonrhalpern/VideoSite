@@ -24,6 +24,12 @@ interface Database
 
     public function isExecuted($query);
 
+    public function insertSeries($series);
+
+    public function deleteSeries($series);
+
+    public function seriesExists($series);
+
 }
 
 ?>

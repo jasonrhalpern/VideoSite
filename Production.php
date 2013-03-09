@@ -5,15 +5,17 @@
 
 abstract class Production
 {
-
+    protected $id;
     protected $title;
     protected $description;
     protected $videos; //array
-    protected $id;
     protected $tags; //array
+    protected $db;
 
-    public function __construct()
-    {
+    public function __construct($title, $description){
+        $this->title = $title;
+        $this->description = $description;
+        $this->db = new MySQL();
     }
 
     public function addVideo()
