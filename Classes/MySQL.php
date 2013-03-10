@@ -79,13 +79,14 @@ class MySQL implements Database{
 
     public function insertSeries($series){
 
+        /* user is trying to create a series with the same name as one that already exists */
         if($this->seriesExists($series))
             return false;
 
         $temp_id = 0;
 
         $query = $this->dbh->prepare("insert into series values(?, ?, ?, ?, ?, ?, ?)");
-        $query->bind_param("iisisss", $temp_id, $series->getCreatorId(), $series->getCreated(),
+        $query->bind_param("iisisss", $temp_id, $series->getCreatorId(), $series->getCreatedDate(),
                     $series->getSeasonNum(), $series->getTitle(), $series->getDescription(), $series->getCategory());
 
         return $this->isExecuted($query);

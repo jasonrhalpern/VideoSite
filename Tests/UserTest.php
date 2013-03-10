@@ -4,8 +4,8 @@
  */
 
 require_once 'PHPUnit/Autoload.php';
-require_once dirname(__FILE__) . '/../User.php';
-require_once dirname(__FILE__) . '/../MySQL.php';
+require_once dirname(__FILE__) . '/../Classes/User.php';
+require_once dirname(__FILE__) . '/../Classes/MySQL.php';
 
 class UserTest extends PHPUnit_Framework_TestCase{
 
@@ -66,6 +66,7 @@ class UserTest extends PHPUnit_Framework_TestCase{
         $this->assertEquals($user->getName(), 'Donope Gangsta');
         $this->assertEquals($user->getJoined(), DateHelper::currentDate());
 
+        /* the next three users do not exist */
         $failedLogin = User::login("bagadfasdf", "asdasdawnnosdfp");
         $this->assertFalse($failedLogin);
 

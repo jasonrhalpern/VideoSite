@@ -8,7 +8,7 @@ abstract class Production
     protected $id;
     protected $title;
     protected $description;
-    protected $videos; //array
+    protected $videos; //array of Video objects
     protected $tags; //array
     protected $db;
 
@@ -55,6 +55,10 @@ abstract class Production
         return $this->id;
     }
 
+    public function setId($id){
+        $this->id = $id;
+    }
+
     public function showVideos()
     {
     }
@@ -79,6 +83,10 @@ abstract class Production
 
     public function removeTag()
     {
+    }
+
+    public function getDBConnection(){
+        return $this->db->getDBConnection();
     }
 }
 

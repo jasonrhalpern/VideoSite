@@ -14,15 +14,15 @@ interface Database
 
     public function isConnected();
 
+    public function dataExists($query);
+
+    public function isExecuted($query);
+
     public function insertUser($user);
 
     public function deleteUser($user);
 
     public function userExists($user);
-
-    public function dataExists($query);
-
-    public function isExecuted($query);
 
     public function insertSeries($series);
 

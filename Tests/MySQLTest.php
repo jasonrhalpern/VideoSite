@@ -4,9 +4,9 @@
  */
 
 require_once 'PHPUnit/Autoload.php';
-require_once dirname(__FILE__) . '/../MySQL.php';
-require_once dirname(__FILE__) . '/../User.php';
-require_once dirname(__FILE__) . '/../Series.php';
+require_once dirname(__FILE__) . '/../Classes/MySQL.php';
+require_once dirname(__FILE__) . '/../Classes/User.php';
+require_once dirname(__FILE__) . '/../Classes/Series.php';
 
 class MySQLTest extends PHPUnit_Framework_TestCase{
     protected $user;
