@@ -2,7 +2,7 @@
 
     require_once('/home/simawatkinto/AppConfig.php');
 
-    /* Include the SDK using the Composer autoloader */
+    /* Include the Amazon Web Services SDK for PHP */
     require_once 'AWS-SDK-PHP/aws.phar';
 
     use Aws\S3\S3Client;
@@ -13,7 +13,10 @@
         'secret' => AppConfig::getAwsSecret(),
     ));
 
-    $bucket = 'my-bucketdeuces';
+    /* create a new bucket within assets.gookeyz.com */
+    $bucket = 'assets.gookeyz.com/my-bucketdeuces7/';
+    /* create a regular bucket at the root of my S3 domain */
+    $buck = 'my-bucketdeuces7';
 
     $result = $client->createBucket(array(
         'Bucket' => $bucket
