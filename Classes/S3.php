@@ -74,6 +74,9 @@ class S3 implements FileStorage{
 
     public function seriesFolderExists($series){
 
+        $bucketName = $series->getFullSeriesPath();
+
+        return $this->s3Client->doesBucketExist($bucketName);
     }
 
     public function seasonFolderExists($series){

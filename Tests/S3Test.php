@@ -9,6 +9,7 @@ require_once dirname(__FILE__) . '/../Classes/S3.php';
 class S3Test extends PHPUnit_Framework_TestCase{
 
     protected $series;
+    protected $seriesTwo;
     protected $s3Client;
 
     public function setUp(){
@@ -24,5 +25,13 @@ class S3Test extends PHPUnit_Framework_TestCase{
 
     public function testCreateSeriesFolder(){
         $this->assertTrue($this->s3Client->createSeriesFolder($this->series));
+    }
+
+    public function testSeriesFolderExists(){
+        $this->assertTrue($this->s3Client->seriesFolderExists($this->series));
+    }
+
+    public function testDeleteSeriesFolder(){
+        $this->assertTrue($this->s3Client->deleteSeriesFolder($this->series));
     }
 }

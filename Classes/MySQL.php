@@ -79,7 +79,7 @@ class MySQL implements Database{
 
     public function insertSeries($series){
 
-        /* user is trying to create a series with the same name as one that already exists */
+        /* check if a user is trying to create a series with the same name as one that already exists */
         if($this->seriesExists($series))
             return false;
 

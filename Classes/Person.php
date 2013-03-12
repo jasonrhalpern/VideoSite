@@ -11,6 +11,7 @@ abstract class Person
     protected $id;
     protected $password;
     protected $db;
+    protected $fileStorage;
 
     public function __construct($name, $email, $username, $id, $password){
         $this->name = $name;
@@ -19,6 +20,7 @@ abstract class Person
         $this->id = $id;
         $this->password = $password;
         $this->db = new MySQL();
+        $this->fileStorage = new S3();
     }
 
     public function getName()
