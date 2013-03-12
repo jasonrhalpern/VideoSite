@@ -4,6 +4,7 @@
  */
 
 require_once('Production.php');
+require_once('DateHelper.php');
 
 class Series extends Production
 {
@@ -91,6 +92,17 @@ class Series extends Production
 
     public function setSeasonNum($number){
         $this->seasonNum = $number;
+    }
+
+    /* folder that stores all videos for this series */
+    public function getFolderName(){
+        /* replace the whitespace with underscores to get the right folder */
+        return str_replace(' ', '_', $this->getTitle());
+    }
+
+    /* This is the full path for a bucket of a series */
+    public function getFullSeriesPath(){
+        return AppConfig::getS3Root() . $this->getFolderName() . '/';
     }
 
     public function getCrew(){

@@ -52,4 +52,14 @@ class SeriesTest extends PHPUnit_Framework_TestCase{
         $seriesThree = Series::loadSeriesByTitle('Winkle and Dinkle Go Wes');
         $this->assertFalse($seriesThree);
     }
+
+    public function testGetFolderName(){
+        $folder = $this->seriesOne->getFolderName();
+        $this->assertEquals('Winkle_and_Dinkle_Go_West', $folder);
+    }
+
+    public function testGetFullSeriesPath(){
+        $fullPath = $this->seriesOne->getFullSeriesPath();
+        $this->assertEquals('assets.gookeyz.com/Winkle_and_Dinkle_Go_West/', $fullPath);
+    }
 }

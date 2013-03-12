@@ -2,6 +2,7 @@
 /**
  * @author Jason Halpern
  */
+require_once dirname(__FILE__) . '/../Classes/MySQL.php';
 
 abstract class Production
 {
