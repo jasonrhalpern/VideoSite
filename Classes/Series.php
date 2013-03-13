@@ -109,8 +109,14 @@ class Series extends Production
 
     }
 
-    public function createNewSeason()
-    {
+    public function addNewSeason(){
+        /* increment the season number for this series in the database */
+        return $this->db->incrSeasonNum($this);
+    }
+
+    public function isProducer($producer){
+
+        return $producer->getId() === $this->getCreatorId();
     }
 
     public function getFullSeries()

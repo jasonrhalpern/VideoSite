@@ -107,6 +107,15 @@ class MySQL implements Database{
         return $this->dataExists($query);
     }
 
+    /* increase the season number for a series */
+    public function incrSeasonNum($series){
+        $newSeasonNum = $series->getSeasonNum() + 1;
+        $query = $this->dbh->prepare("update series set seasons = ".$newSeasonNum." where series_id = ?");
+        $query->bind_param("i", $series->getId());
+
+        return $this->isExecuted($query);
+    }
+
     /* check if our database query returned any results */
     public function dataExists($query){
         $query->execute();

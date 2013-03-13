@@ -4,6 +4,7 @@
  */
 require_once dirname(__FILE__) . '/../Classes/Series.php';
 require_once dirname(__FILE__) . '/../Classes/MySQL.php';
+require_once dirname(__FILE__) . '/../Classes/User.php';
 
 class SeriesTest extends PHPUnit_Framework_TestCase{
 
@@ -61,5 +62,49 @@ class SeriesTest extends PHPUnit_Framework_TestCase{
     public function testGetFullSeriesPath(){
         $fullPath = $this->seriesOne->getFullSeriesPath();
         $this->assertEquals('assets.gookeyz.com/Winkle_and_Dinkle_Go_West/', $fullPath);
+    }
+
+    public function testAddNewSeason(){
+
+        $series = new Series(1, 'The End of The World Is Awesomme', 'It all ends tonight and we are ready to party',
+            'Sci-Fi/Fantasy', 1);
+
+        $this->assertTrue($this->dbConnection->insertSeries($series));
+        $series = Series::loadSeriesByTitle('The End of The World Is Awesomme');
+
+        $this->assertTrue($this->dbConnection->incrSeasonNum($series));
+        $series = Series::loadSeriesByTitle('The End of The World Is Awesomme');
+        $this->assertEquals(2, $series->getSeasonNum());
+
+        $this->assertTrue($this->dbConnection->incrSeasonNum($series));
+        $series = Series::loadSeriesByTitle('The End of The World Is Awesomme');
+        $this->assertEquals(3, $series->getSeasonNum());
+
+        $this->dbConnection->deleteSeries($series);
+
+    }
+
+    public function testIsProducer(){
+
+        $user = new User('Donope Gangsta', 'georgeiee106@aol.com', 'GMoney5897', 1, 'tanya');
+        $this->assertTrue($this->dbConnection->insertUser($user));
+        $user = User::login($user->getEmail(), $user->getPassword());
+
+        $series = new Series($user->getId(), 'The End of The World Is Awesomme',
+                            'It all ends tonight and we are ready to party', 'Sci-Fi/Fantasy', 1);
+        $this->assertTrue($this->dbConnection->insertSeries($series));
+        $series = Series::loadSeriesByTitle('The End of The World Is Awesomme');
+        $this->assertTrue($series->isProducer($user));
+
+
+        $userTwo = new User('asdfsdfsafasdfsadf', 'ppoosdfis13@aol.com', 'GMoney32897', 1, 'tanya');
+        $this->assertTrue($this->dbConnection->insertUser($userTwo));
+        $userTwo = User::login($userTwo->getEmail(), $userTwo->getPassword());
+        $this->assertFalse($series->isProducer($userTwo));
+
+
+        $this->assertTrue($this->dbConnection->deleteUser($user));
+        $this->assertTrue($this->dbConnection->deleteUser($userTwo));
+        $this->assertTrue($this->dbConnection->deleteSeries($series));
     }
 }

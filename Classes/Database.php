@@ -20,6 +20,7 @@ interface Database
     public function insertSeries($series);
     public function deleteSeries($series);
     public function seriesExists($series);
+    public function incrSeasonNum($series);
 
 }
 

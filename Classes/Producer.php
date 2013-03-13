@@ -3,24 +3,33 @@
  * @author Jason Halpern
  */
 
+require_once('User.php');
+
 class Producer extends User{
 
-    protected $productions; //array of IDs of this person's productions
+    protected $productions; //array of IDs of this producer's productions
 
     public function __construct($user){
 
-        parent::__construct($user->getName(), $user->getEmail(), $user->getUsername,
+        parent::__construct($user->getName(), $user->getEmail(), $user->getUsername(),
                             $user->getId(), $user->getPassword());
     }
 
-    public function createNewSeason()
-    {
+    public function createNewSeason($series){
+
+        return $series->addNewSeason();
     }
 
     public function createSeries($series){
 
-        //insert series in DB
-        //create folder in S3
+        /* insert series into our database and create a folder for the series episodes */
+        if($this->db->insertSeries($series)){
+            if($this->fileStorage->createSeriesFolder($series))
+                //upload pilot episode??
+                return true;
+        }
+
+        return false;
     }
 
     public function addVidToSeries()
