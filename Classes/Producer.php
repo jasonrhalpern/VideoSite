@@ -48,8 +48,12 @@ class Producer extends User{
     {
     }
 
-    public function editSeriesDescr()
-    {
+    /* change the description for a series */
+    public function editSeriesDescr($series, $newDescription){
+        $query = $this->getDBConnection()->prepare("update series set description = ? where series_id = ?");
+        $query->bind_param("si", $newDescription, $series->getId());
+
+        return $this->db->isExecuted($query);
     }
 
     public function editSeriesWriters()

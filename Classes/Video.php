@@ -16,6 +16,9 @@ class Video
     protected $length;
     protected $likes;
     protected $dislikes;
+    protected $seriesId;
+    protected $seasonNumber;
+    protected $episodeNumber;
 
     public function __construct()
     {

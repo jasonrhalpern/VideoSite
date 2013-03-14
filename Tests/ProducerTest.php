@@ -58,4 +58,17 @@ class ProducerTest extends PHPUnit_Framework_TestCase{
         $this->assertTrue($this->dbConnection->deleteSeries($this->series));
     }
 
+    public function testEditSeriesDescr(){
+        $this->assertTrue($this->producer->createSeries($this->series));
+
+        $series = Series::loadSeriesByTitle('Figaro Saves The World Part Deux');
+        $this->assertEquals($series->getDescription(),'Figaros Heroic Effort To Save The World');
+        $this->assertTrue($this->producer->editSeriesDescr($series, 'Figaros Failed Heroic Effort To Save Us'));
+
+        $seriesTwo = Series::loadSeriesByTitle('Figaro Saves The World Part Deux');
+        $this->assertEquals($seriesTwo->getDescription(), 'Figaros Failed Heroic Effort To Save Us');
+
+        $this->assertTrue($this->dbConnection->deleteSeries($this->series));
+    }
+
 }

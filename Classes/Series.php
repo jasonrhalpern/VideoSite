@@ -27,6 +27,7 @@ class Series extends Production
         $series = new Series(null, null, null, null, null);
         $query = $series->getDBConnection()->prepare("select * from series where series_id = ?");
         $query->bind_param("s", $seriesId);
+
         $series->getSeriesInfo($query);
 
         if(is_null($series->getTitle()))
@@ -39,6 +40,7 @@ class Series extends Production
         $series = new Series(null, null, null, null, null);
         $query = $series->getDBConnection()->prepare("select * from series where title = ?");
         $query->bind_param("s", $seriesTitle);
+
         $series->getSeriesInfo($query);
 
         if(is_null($series->getId()))
@@ -109,9 +111,14 @@ class Series extends Production
 
     }
 
+    /* increase the season number for a series */
     public function addNewSeason(){
         /* increment the season number for this series in the database */
-        return $this->db->incrSeasonNum($this);
+        $newSeasonNum = $this->getSeasonNum() + 1;
+        $query = $this->getDBConnection()->prepare("update series set seasons = ? where series_id = ?");
+        $query->bind_param("ii", $newSeasonNum, $this->getId());
+
+        return $this->db->isExecuted($query);
     }
 
     public function isProducer($producer){

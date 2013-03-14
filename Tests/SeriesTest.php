@@ -72,11 +72,11 @@ class SeriesTest extends PHPUnit_Framework_TestCase{
         $this->assertTrue($this->dbConnection->insertSeries($series));
         $series = Series::loadSeriesByTitle('The End of The World Is Awesomme');
 
-        $this->assertTrue($this->dbConnection->incrSeasonNum($series));
+        $this->assertTrue($series->addNewSeason());
         $series = Series::loadSeriesByTitle('The End of The World Is Awesomme');
         $this->assertEquals(2, $series->getSeasonNum());
 
-        $this->assertTrue($this->dbConnection->incrSeasonNum($series));
+        $this->assertTrue($series->addNewSeason());
         $series = Series::loadSeriesByTitle('The End of The World Is Awesomme');
         $this->assertEquals(3, $series->getSeasonNum());
 
