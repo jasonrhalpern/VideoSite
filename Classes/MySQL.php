@@ -59,8 +59,7 @@ class MySQL implements Database{
 
 
     /**
-     * Add the user to the database, but check the details first to make sure a user
-     * with this information doesn't already exist
+     * Add the user to the database
      *
      * @param User $newUser The user we want to insert into the database
      * @return bool True if the user has been inserted into the database, False otherwise
