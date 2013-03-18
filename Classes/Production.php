@@ -1,7 +1,11 @@
 <?php
 /**
+ * The abstract Production class includes details that are common to all
+ * types of Productions (i.e. Series, Competitions, etc).
+ *
  * @author Jason Halpern
  */
+
 require_once dirname(__FILE__) . '/../Classes/MySQL.php';
 
 abstract class Production
@@ -31,31 +35,55 @@ abstract class Production
         //connect to DB, remove details to DB
     }
 
+    /**
+     * @return string The description for the series
+     */
     public function getDescription()
     {
         return $this->description;
     }
 
+    /**
+     * Set the description for the series
+     *
+     * @param string $newDescr The description of the series
+     */
     public function setDescription($newDescr)
     {
         $this->description = $newDescr;
     }
 
+    /**
+     * @return string The title of the series
+     */
     public function getTitle()
     {
         return $this->title;
     }
 
+    /**
+     * Set the title for the series
+     *
+     * @param string $newTitle The title of the series
+     */
     public function setTitle($newTitle)
     {
         $this->title = $newTitle;
     }
 
+    /**
+     * @return int The id of the series
+     */
     public function getId()
     {
         return $this->id;
     }
 
+    /**
+     * Set the id for the series
+     *
+     * @param int $id The id of the series
+     */
     public function setId($id){
         $this->id = $id;
     }
@@ -68,11 +96,19 @@ abstract class Production
     {
     }
 
+    /**
+     * @return array The tags for the series
+     */
     public function getTags()
     {
         return $this->tags;
     }
 
+    /**
+     * Set the tags for the series
+     *
+     * @param array $newTags The tags for the series
+     */
     public function setTags($newTags)
     {
         $this->tags = $newTags;

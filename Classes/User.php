@@ -1,5 +1,8 @@
 <?php
 /**
+ * This class encapsulates all the details for a user on our site. It extends the
+ * Person class in Person.php
+ *
  * @author Jason Halpern
  */
 
@@ -18,11 +21,21 @@ class User extends Person{
         $this->joined = DateHelper::currentDate();
     }
 
-    /* check if this user exists in the database */
+    /**
+     * Check if this user exists in the database
+     *
+     * @return bool True if this user has registered with our site, False otherwise
+     */
     public function isRegistered(){
         return $this->db->userExists($this);
     }
 
+    /**
+     * Register a user. Before registering, we have to make sure the user's
+     * details are unique
+     *
+     * @return bool True if we registered the user, False otherwise
+     */
     public function register(){
 
         if($this->hasDuplicateEmail())
@@ -38,7 +51,13 @@ class User extends Person{
 
     }
 
-    /* check if there is a user with the email and password provided */
+    /**
+     * Check if there is a registered user with the email and password provided
+     *
+     * @param string $email
+     * @param string $password
+     * @return bool|User A User object if we could log the user in, False otherwise
+     */
     public static function login($email, $password){
 
         $user = new User(null, null, null, null, null);
@@ -55,7 +74,9 @@ class User extends Person{
 
     }
 
-    /* load all of the user details from the database */
+    /**
+     * Load all of the user details from the database
+     */
     public function loadDetails(){
         $query = $this->getDBConnection()->prepare("select * from users where email = ? and password = ?");
         $query->bind_param("ss", $this->getEmail(), $this->getEncryptedPassword());
@@ -69,7 +90,11 @@ class User extends Person{
         }
     }
 
-    /* check if this user is trying to register with an email already in the system */
+    /**
+     * Check if this user is trying to register with an email already in the system
+     *
+     * @return bool True if this user has a duplicate email, False otherwise
+     */
     public function hasDuplicateEmail(){
         $query = $this->getDBConnection()->prepare("select * from users where email = ?");
         $query->bind_param("s", $this->getEmail());
@@ -77,7 +102,11 @@ class User extends Person{
         return $this->db->dataExists($query);
     }
 
-    /* check if this user is trying to register with a username already in the system */
+    /**
+     * Check if this user is trying to register with a username already in the system
+     *
+     * @return bool True if the user has a duplicate username, False otherwise
+     */
     public function hasDuplicateUsername(){
 
         $query = $this->getDBConnection()->prepare("select * from users where username = ?");
@@ -87,6 +116,11 @@ class User extends Person{
 
     }
 
+    /**
+     * Check if the email address provided is valid
+     *
+     * @return bool True if the email address is valid, False otherwise
+     */
     public function hasValidEmail(){
 
         //test that email address is valid format
@@ -116,6 +150,12 @@ class User extends Person{
         $this->joined = $date;
     }
 
+    /**
+     * Change the username of this User
+     *
+     * @param string $newUsername The new username
+     * @return bool True if the username has been changed, False otherwise
+     */
     public function changeUsername($newUsername){
 
         /* change the username to the new one, but save the old one */
@@ -139,6 +179,12 @@ class User extends Person{
         return false;
     }
 
+    /**
+     * Change the password for this user
+     *
+     * @param string $newPassword
+     * @return bool True if the password is changed in our DB, False otherwise
+     */
     public function changePassword($newPassword){
 
         /* only change the password if this user has already registered in our database */
@@ -155,6 +201,11 @@ class User extends Person{
         return false;
     }
 
+    /**
+     * Generate a new password for this user and reset it
+     *
+     * @return string The new password
+     */
     public function resetPassword(){
 
         $newPassword = HelperFunc::generateRandomPassword();

@@ -1,5 +1,9 @@
 <?php
 /**
+ * The Series class includes all the information related to a particular series:
+ * the category of the series, number of seasons in the series, the date it was
+ * created, etc. It extends the Production class in Production.php.
+ *
  * @author Jason Halpern
  */
 
@@ -23,6 +27,13 @@ class Series extends Production
         $this->seasonNum = $seasonNumber;
     }
 
+    /**
+     * Create a series object from the ID. We can do this by using the
+     * ID to fetch the rest of the details from the database.
+     *
+     * @param int $seriesId The id of the series we are getting the details about
+     * @return bool|Series The series object with all the series details, False if we can't find it
+     */
     public static function loadSeriesById($seriesId){
         $series = new Series(null, null, null, null, null);
         $query = $series->getDBConnection()->prepare("select * from series where series_id = ?");
@@ -36,6 +47,13 @@ class Series extends Production
         return $series;
     }
 
+    /**
+     * Create a series object from the title. We can do this by using the
+     * title to fetch the rest of the details from the database.
+     *
+     * @param string $seriesTitle The title of the series we are getting the details about
+     * @return bool|Series The series object with all the series details, False if we can't find it
+     */
     public static function loadSeriesByTitle($seriesTitle){
         $series = new Series(null, null, null, null, null);
         $query = $series->getDBConnection()->prepare("select * from series where title = ?");
@@ -49,6 +67,12 @@ class Series extends Production
         return $series;
     }
 
+    /**
+     * Execute a query about a Series and then load all the details of the series that
+     * match the query
+     *
+     * @param mysqli $query The query we are executing
+     */
     public function getSeriesInfo($query){
         $query->execute();
         $query->bind_result($id, $creatorId, $createdDate, $seasonNumber, $title, $description, $category);
@@ -88,21 +112,42 @@ class Series extends Production
         $this->category = $category;
     }
 
+    /**
+     * Return the number of seasons for this series
+     *
+     * @return int The number of seasons in the series
+     */
     public function getSeasonNum(){
         return $this->seasonNum;
     }
 
+    /**
+     * Set the number of seasons for this series
+     *
+     * @param int $number Number of seasons
+     */
     public function setSeasonNum($number){
         $this->seasonNum = $number;
     }
 
-    /* folder that stores all videos for this series */
+    /**
+     * Return the name of the folder that stores all videos for this series.
+     * Whitespace is replaced by underscores because S3 buckets cannot have whitespace.
+     *
+     * @return string The bucket name for this series
+     */
     public function getFolderName(){
         /* replace the whitespace with underscores to get the right folder */
         return str_replace(' ', '_', $this->getTitle());
     }
 
-    /* This is the full path for a bucket of a series */
+    /**
+     * This is the full path for a bucket of a series. It is different from just
+     * the bucket name in that it also includes the root S3 bucket. The full bucket
+     * path is needed to correctly add/remove files and folders from S3.
+     *
+     * @return string The full path for this series.
+     */
     public function getFullSeriesPath(){
         return AppConfig::getS3Root() . $this->getFolderName() . '/';
     }
@@ -111,7 +156,11 @@ class Series extends Production
 
     }
 
-    /* increase the season number for a series */
+    /**
+     * Increase the season number for a series
+     *
+     * @return bool True if a new season was added, False otherwise.
+     */
     public function addNewSeason(){
         /* increment the season number for this series in the database */
         $newSeasonNum = $this->getSeasonNum() + 1;
@@ -121,6 +170,13 @@ class Series extends Production
         return $this->db->isExecuted($query);
     }
 
+    /**
+     * Check to see if a producer is actually the producer of this series. We do this
+     * by checking to see if the producer's id matches the id of the series creator.
+     *
+     * @param Producer $producer
+     * @return bool True if this is a producer for this series, False otherwise.
+     */
     public function isProducer($producer){
 
         return $producer->getId() === $this->getCreatorId();

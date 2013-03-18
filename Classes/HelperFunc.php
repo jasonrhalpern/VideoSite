@@ -1,14 +1,21 @@
 <?php
 /**
+ * This includes random functions that we will need throughout our system.
+ *
  * @author Jason Halpern
  */
 class HelperFunc{
 
+    /**
+     * Generates a random password using a word and a number
+     *
+     * @return string A new password
+     */
     public static function generateRandomPassword(){
         /*
-        * array of random words to generate new passwords, a number is added to the end of the word below
-        * so the password remains unique
-        */
+         * Array of random words to generate new passwords.
+         * A number is added to the end of the word below so the password remains unique.
+         */
         $words = array('mother', 'brother', 'seattle', 'newark', 'lists', 'piano', 'trumpet', 'kitchen',
             'freezer', 'couch', 'plant','smoke', 'beer', 'music', 'silly', 'goose', 'horse', 'books',
             'heart', 'kidney', 'brain', 'grass', 'iron', 'leather', 'sneaker', 'flex', 'steel', 'bucket',

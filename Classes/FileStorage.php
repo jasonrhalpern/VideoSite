@@ -1,5 +1,9 @@
 <?php
 /**
+ * This interface includes all the functions that our file storage system
+ * will need to support. Our file storage (i.e. Amazon's S3) will be where
+ * we store videos, thumbnails, pictures and other files.
+ *
  * @author Jason Halpern
  */
 interface FileStorage{
