@@ -134,7 +134,7 @@ class User extends Person{
             }
         }
 
-        /* username has not been updated, reset it to the old one */
+        /* if we reach here the username has not been updated, reset it to the old one */
         $this->setUsername($oldUsername);
         return false;
     }

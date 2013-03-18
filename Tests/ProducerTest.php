@@ -56,6 +56,7 @@ class ProducerTest extends PHPUnit_Framework_TestCase{
         $this->assertEquals(3, $series->getSeasonNum());
 
         $this->assertTrue($this->dbConnection->deleteSeries($this->series));
+        $this->assertTrue($this->s3Client->deleteSeriesFolder($this->series));
     }
 
     public function testEditSeriesDescr(){
@@ -69,6 +70,7 @@ class ProducerTest extends PHPUnit_Framework_TestCase{
         $this->assertEquals($seriesTwo->getDescription(), 'Figaros Failed Heroic Effort To Save Us');
 
         $this->assertTrue($this->dbConnection->deleteSeries($this->series));
+        $this->assertTrue($this->s3Client->deleteSeriesFolder($this->series));
     }
 
 }

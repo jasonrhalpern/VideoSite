@@ -29,7 +29,8 @@ class S3 implements FileStorage{
 
         /* create a bucket in s3 for the series */
         $this->s3Client->createBucket(array(
-            'Bucket' => $bucketName
+            'Bucket' => $bucketName,
+            'ACL' => 'public-read'
         ));
 
         /* bucket should have been created at this point */
