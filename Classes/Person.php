@@ -1,6 +1,6 @@
 <?php
 /**
- * The abstract class is being used to represent many field and operations
+ * This abstract class is being used to represent many field and operations
  * that will be common to all types of people using the site (i.e. Users, Admin,
  * Producers). Fields such as username, email, password, etc., and the
  * getters/setters associated with such fields will be needed by the variety of
@@ -76,6 +76,9 @@ abstract class Person
         return $this->db->getDBConnection();
     }
 
+    /**
+     * @return string The encrypted password
+     */
     public function getEncryptedPassword(){
         $salt = AppConfig::getSalt();
         $password = strtolower($this->getPassword());

@@ -14,11 +14,16 @@ require_once dirname(__FILE__) . '/../AWS_SDK_PHP/aws.phar';
 require_once dirname(__FILE__) . '/../Classes/FileStorage.php';
 
 use Aws\S3\S3Client;
+use Aws\Common\Aws;
+use Aws\Common\Enum\Size;
+use Aws\Common\Exception\MultipartUploadException;
+use Aws\S3\Model\MultipartUpload\UploadBuilder;
+use Guzzle\Http\EntityBody;
 
 class S3 implements FileStorage{
 
     /**
-     * @var Aws\S3\S3Client $s3Client Our portal into our S3 service
+     * @var S3Client $s3Client Our portal into our S3 service
      */
     protected  $s3Client;
 
@@ -33,7 +38,7 @@ class S3 implements FileStorage{
     /**
      * Create a bucket to hold the files for a particular series
      *
-     * @param Series $series The series we are creating a bucket for
+     * @param Series $series The series for which we are creating a bucket
      * @return bool True if the bucket has been created, False otherwise
      */
     public function createSeriesFolder($series){
@@ -58,7 +63,7 @@ class S3 implements FileStorage{
      * Delete a bucket that holds the files for a particular series. All
      * files in the bucket will also be removed.
      *
-     * @param Series $series The series we are deleting a bucket for
+     * @param Series $series The series for which we are deleting a bucket
      * @return bool True if the bucket has been deleted, False otherwise
      */
     public function deleteSeriesFolder($series){
@@ -85,13 +90,108 @@ class S3 implements FileStorage{
 
     }
 
-    public function addVideoFile($series){
+    /**
+     * Upload a video to the S3 service. The video will be on our server and
+     * we will then need to add it to the appropriate bucket in S3. The name of
+     * the video will change when we upload it to S3.
+     *
+     * @param string $fileName The name of the video file we are uploading from
+     * the local filesystem
+     * @param string $key The desired name of the file as it will appear in S3
+     * @param string $folderName The S3 bucket the video will be uploaded to
+     * @return bool True if the video was uploaded, False otherwise
+     */
+    public function uploadVideo($fileName, $key, $folderName){
 
+        $body = EntityBody::factory(fopen($fileName, 'r'));
+
+        /* Create a transfer object from the builder */
+        $transfer = UploadBuilder::newInstance()
+            ->setClient($this->s3Client) // An S3 client
+            ->setSource($body) // Can be a path, file handle, or EntityBody object
+            ->setBucket($folderName) // Bucket
+            ->setKey($key) // Desired object key
+            ->setMinPartSize(10 * Size::MB) // Minimum part size to use (at least 5 MB)
+            ->setHeaders(array(
+                'ACL' => 'public-read',
+                'ContentType' => 'video/quicktime',
+                //'ContentType' => $_FILES['image']['type'],
+            ))
+            ->build();
+
+        /* Perform the upload */
+        try {
+            $transfer->upload();
+            //code here will execute after upload completes
+        } catch (MultipartUploadException $e) {
+            $transfer->abort();
+        }
+
+        return $this->s3Client->doesObjectExist($folderName, $key);
     }
 
-    public function deleteVideoFile(){
+    /**
+     * Delete a video from S3
+     *
+     * @param string $folderName The folder that the video is stored within
+     * @param string $key The name of the video
+     * @return bool True if the file has been deleted, False otherwise
+     */
+    public function deleteVideo($folderName, $key){
 
+        $this->s3Client->deleteObject(array(
+            'Key' => $key,
+            'Bucket' => $folderName
+        ));
+
+        return !$this->s3Client->doesObjectExist($folderName, $key);
     }
+
+    /**
+     * Upload an image to the S3 service. The image will be on our server and
+     * we will then need to add it to the appropriate bucket in S3. The name of
+     * the image will change when we upload it to S3.
+     *
+     * @param string $fileName The name of the image file we are uploading from
+     * the local filesystem
+     * @param string $key The desired name of the file as it will appear in S3
+     * @param string $folderName The S3 bucket the image will be uploaded to
+     * @return bool True if the image was uploaded, False otherwise
+     */
+    public function uploadImage($fileName, $key, $folderName){
+
+        $image = file_get_contents($fileName);
+
+        $this->s3Client->putObject(array(
+            'Key' => $key,
+            'ACL' => 'public-read',
+            'Body'	=> $image,
+            'ContentType' => 'image/jpeg',
+            //'ContentType' => $_FILES['image']['type'],
+            'Bucket' => $folderName
+        ));
+
+        return $this->s3Client->doesObjectExist($folderName, $key);
+    }
+
+    /**
+     * Delete an image from S3
+     *
+     * @param string $folderName The folder that the image is stored within
+     * @param string $key The name of the image
+     * @return bool True if the file has been deleted, False otherwise
+     */
+    public function deleteImage($folderName, $key){
+
+        $this->s3Client->deleteObject(array(
+            'Key' => $key,
+            'Bucket' => $folderName
+        ));
+
+        return !$this->s3Client->doesObjectExist($folderName, $key);
+    }
+
+
 
     /**
      * Check to see if a bucket exists for a particular series

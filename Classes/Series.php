@@ -146,7 +146,7 @@ class Series extends Production
      * the bucket name in that it also includes the root S3 bucket. The full bucket
      * path is needed to correctly add/remove files and folders from S3.
      *
-     * @return string The full path for this series.
+     * @return string The full path to the bucket for this series.
      */
     public function getFullSeriesPath(){
         return AppConfig::getS3Root() . $this->getFolderName() . '/';
@@ -164,6 +164,7 @@ class Series extends Production
     public function addNewSeason(){
         /* increment the season number for this series in the database */
         $newSeasonNum = $this->getSeasonNum() + 1;
+        $this->setSeasonNum($newSeasonNum);
         $query = $this->getDBConnection()->prepare("update series set seasons = ? where series_id = ?");
         $query->bind_param("ii", $newSeasonNum, $this->getId());
 

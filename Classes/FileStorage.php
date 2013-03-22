@@ -14,8 +14,11 @@ interface FileStorage{
     public function createSeasonFolder($series);
     public function deleteSeasonFolder($series, $seasonNumber);
 
-    public function addVideoFile($series);
-    public function deleteVideoFile();
+    public function uploadVideo($fileName, $key, $folderName);
+    public function deleteVideo($folderName, $key);
+
+    public function uploadImage($fileName, $key, $folderName);
+    public function deleteImage($folderName, $key);
 
     public function seriesFolderExists($series);
     public function seasonFolderExists($series);

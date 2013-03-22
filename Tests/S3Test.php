@@ -34,4 +34,20 @@ class S3Test extends PHPUnit_Framework_TestCase{
     public function testDeleteSeriesFolder(){
         $this->assertTrue($this->s3Client->deleteSeriesFolder($this->series));
     }
+
+    public function testVideoUpload(){
+        $videoPath = '/var/www/Tests/TestFiles/test.mov';
+        $key = 'testVideo';
+        $bucketName = 'assets.gookeyz.com/test_bucket';
+        $this->assertTrue($this->s3Client->uploadVideo($videoPath, $key, $bucketName));
+        $this->assertTrue($this->s3Client->deleteVideo($bucketName, $key));
+    }
+
+    public function testImageUpload(){
+        $imagePath = '/var/www/Tests/TestFiles/test.jpg';
+        $key = 'testImage';
+        $bucketName = 'assets.gookeyz.com/test_bucket';
+        $this->assertTrue($this->s3Client->uploadImage($imagePath, $key, $bucketName));
+        $this->assertTrue($this->s3Client->deleteImage($bucketName, $key));
+    }
 }

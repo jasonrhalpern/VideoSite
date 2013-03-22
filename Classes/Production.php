@@ -8,8 +8,8 @@
 
 require_once dirname(__FILE__) . '/../Classes/MySQL.php';
 
-abstract class Production
-{
+abstract class Production{
+
     protected $id;
     protected $title;
     protected $description;
@@ -122,6 +122,9 @@ abstract class Production
     {
     }
 
+    /**
+     * @return mysqli The database handle
+     */
     public function getDBConnection(){
         return $this->db->getDBConnection();
     }

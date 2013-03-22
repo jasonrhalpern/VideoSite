@@ -2,7 +2,8 @@
 /**
  * This class includes functions to generate Date and Time information.
  * The functions will be useful for generating date and time information when
- * we need to insert or update that information in the database.
+ * we need to insert or update that information in the database or other
+ * data store.
  *
  * @author Jason Halpern
  */

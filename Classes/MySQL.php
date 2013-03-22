@@ -41,7 +41,6 @@ class MySQL implements Database{
      */
     public function isConnected(){
 
-        //make sure we are connected to the database
         if($this->dbh){
             return true;
         }
