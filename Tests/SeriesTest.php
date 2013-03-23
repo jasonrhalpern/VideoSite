@@ -5,16 +5,19 @@
 require_once dirname(__FILE__) . '/../Classes/Series.php';
 require_once dirname(__FILE__) . '/../Classes/MySQL.php';
 require_once dirname(__FILE__) . '/../Classes/User.php';
+require_once dirname(__FILE__) . '/../Classes/S3.php';
 
 class SeriesTest extends PHPUnit_Framework_TestCase{
 
     protected $seriesOne;
     protected $dbConnection;
+    protected $fileStorage;
 
     public function setUp(){
         $this->seriesOne = new Series(1, 'Winkle and Dinkle Go West', 'Two brothers go on a wilderness adventure',
                                         'Comedy', 1);
         $this->dbConnection = new MySQL();
+        $this->fileStorage = new S3();
     }
 
     public function tearDown(){
@@ -83,6 +86,9 @@ class SeriesTest extends PHPUnit_Framework_TestCase{
         $this->assertTrue($series->addNewSeason());
         $this->assertEquals(4, $series->getSeasonNum());
 
+        $this->assertTrue($this->fileStorage->deleteSeasonFolder($series, 2));
+        $this->assertTrue($this->fileStorage->deleteSeasonFolder($series, 3));
+        $this->assertTrue($this->fileStorage->deleteSeasonFolder($series, 4));
         $this->dbConnection->deleteSeries($series);
 
     }

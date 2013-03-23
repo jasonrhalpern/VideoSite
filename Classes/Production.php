@@ -16,11 +16,13 @@ abstract class Production{
     protected $videos; //array of Video objects
     protected $tags; //array
     protected $db;
+    protected $fileStorage;
 
     public function __construct($title, $description){
         $this->title = $title;
         $this->description = $description;
         $this->db = new MySQL();
+        $this->fileStorage = new S3();
     }
 
     public function addVideo()

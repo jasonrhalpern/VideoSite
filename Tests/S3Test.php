@@ -31,6 +31,18 @@ class S3Test extends PHPUnit_Framework_TestCase{
         $this->assertTrue($this->s3Client->seriesFolderExists($this->series));
     }
 
+    public function testCreateSeasonFolder(){
+        $this->assertTrue($this->s3Client->createSeasonFolder($this->series));
+    }
+
+    public function testSeasonFolderExists(){
+        $this->assertTrue($this->s3Client->seasonFolderExists($this->series, 1));
+    }
+
+    public function testDeleteSeasonFolder(){
+        $this->assertTrue($this->s3Client->deleteSeasonFolder($this->series, 1));
+    }
+
     public function testDeleteSeriesFolder(){
         $this->assertTrue($this->s3Client->deleteSeriesFolder($this->series));
     }

@@ -36,6 +36,44 @@ class S3 implements FileStorage{
     }
 
     /**
+     * Create a folder in S3
+     *
+     * @param string $folderName The full path of the folder to be created
+     */
+    public function createFolder($folderName){
+
+        $this->s3Client->createBucket(array(
+            'Bucket' => $folderName,
+            'ACL' => 'public-read'
+        ));
+    }
+
+    /**
+     * Delete a folder in S3
+     *
+     * @param string $folderName The full path of the folder to be deleted
+     */
+    public function deleteFolder($folderName){
+
+        $this->s3Client->deleteBucket(array(
+            'Bucket' => $folderName
+        ));
+    }
+
+    /**
+     * Check if a folder exists in S3
+     *
+     * @param string $folderName Check if this folder exists
+     */
+    public function folderExists($folderName){
+
+        if($this->s3Client->doesBucketExist($folderName))
+            return true;
+
+        return false;
+    }
+
+    /**
      * Create a bucket to hold the files for a particular series
      *
      * @param Series $series The series for which we are creating a bucket
@@ -46,16 +84,10 @@ class S3 implements FileStorage{
         $bucketName = $series->getFullSeriesPath();
 
         /* create a bucket in s3 for the series */
-        $this->s3Client->createBucket(array(
-            'Bucket' => $bucketName,
-            'ACL' => 'public-read'
-        ));
+        $this->createFolder($bucketName);
 
         /* bucket should have been created at this point */
-        if($this->s3Client->doesBucketExist($bucketName))
-            return true;
-
-        return false;
+        return $this->folderExists($bucketName);
 
     }
 
@@ -70,24 +102,52 @@ class S3 implements FileStorage{
 
         $bucketName = $series->getFullSeriesPath();
 
-        /* create a bucket in s3 for the series */
-        $this->s3Client->deleteBucket(array(
-            'Bucket' => $bucketName
-        ));
+        /* delete a bucket in s3 for the series */
+        $this->deleteFolder($bucketName);
 
         /* bucket should no longer exist at this point */
-        if($this->s3Client->doesBucketExist($bucketName))
-            return false;
-
-        return true;
+        return !$this->folderExists($bucketName);
     }
 
+    /**
+     * Create a new folder to hold the video files for the new season
+     *
+     * @param string $series The series we are creating a new season for
+     * @return bool True if a folder for was created, False otherwise
+     */
     public function createSeasonFolder($series){
 
+        $seriesFolder = $series->getFullSeriesPath();
+        $seasonFolder = 'season_' . $series->getSeasonNum();
+
+        $bucketName = $seriesFolder . $seasonFolder . '/';
+
+        /* create a bucket in s3 for this season */
+        $this->createFolder($bucketName);
+
+        /* bucket should have been created at this point */
+        return $this->folderExists($bucketName);
     }
 
+    /**
+     * Delete the folder that holds the video files for this season
+     *
+     * @param string $series The series we are deleting a season for
+     * @param string $seasonNumber The specific season folder to delete
+     * @return bool True if a folder for was deleted, False otherwise
+     */
     public function deleteSeasonFolder($series, $seasonNumber){
 
+        $seriesFolder = $series->getFullSeriesPath();
+        $seasonFolder = 'season_' . $seasonNumber;
+
+        $bucketName = $seriesFolder . $seasonFolder . '/';
+
+        /* delete a bucket in s3 for this season */
+        $this->deleteFolder($bucketName);
+
+        /* bucket should no longer exist at this point */
+        return !$this->folderExists($bucketName);
     }
 
     /**
@@ -203,10 +263,23 @@ class S3 implements FileStorage{
 
         $bucketName = $series->getFullSeriesPath();
 
-        return $this->s3Client->doesBucketExist($bucketName);
+        return $this->folderExists($bucketName);
     }
 
-    public function seasonFolderExists($series){
+    /**
+     * Check to see if a bucket exists for a particular season of a series
+     *
+     * @param Series $series The series we are looking up
+     * @param string $seasonNum The specific season we are looking up
+     * @return bool True if the bucket exists for the series, False otherwise
+     */
+    public function seasonFolderExists($series, $seasonNum){
 
+        $seriesFolder = $series->getFullSeriesPath();
+        $seasonFolder = 'season_' . $seasonNum;
+
+        $bucketName = $seriesFolder . $seasonFolder . '/';
+
+        return $this->folderExists($bucketName);
     }
 }

@@ -157,18 +157,24 @@ class Series extends Production
     }
 
     /**
-     * Increase the season number for a series
+     * Create a new season for this series. Creating a new season involves updating
+     * the season number in the database and creating a new folder in our filesystem
+     * to hold the video files for the season.
      *
-     * @return bool True if a new season was added, False otherwise.
+     * @return bool True if a new season was created, False otherwise.
      */
     public function addNewSeason(){
+
         /* increment the season number for this series in the database */
         $newSeasonNum = $this->getSeasonNum() + 1;
         $this->setSeasonNum($newSeasonNum);
         $query = $this->getDBConnection()->prepare("update series set seasons = ? where series_id = ?");
         $query->bind_param("ii", $newSeasonNum, $this->getId());
 
-        return $this->db->isExecuted($query);
+        /* create a new folder to hold the video files for the new season */
+        $isFolderCreated = $this->fileStorage->createSeasonFolder($this);
+
+        return ($this->db->isExecuted($query) && $isFolderCreated);
     }
 
     /**

@@ -41,11 +41,15 @@ class Producer extends User{
      */
     public function createSeries($series){
 
-        /* insert series into our database and create a folder for the series episodes */
+        /*
+         * insert series into our database and create a folder for the series episodes
+         * and create a folder for season 1 episodes
+         */
         if($this->db->insertSeries($series)){
             if($this->fileStorage->createSeriesFolder($series))
-                //upload pilot episode??
-                return true;
+                if($this->fileStorage->createSeasonFolder($series))
+                    //upload pilot episode??
+                    return true;
         }
 
         return false;
