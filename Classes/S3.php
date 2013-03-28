@@ -151,6 +151,36 @@ class S3 implements FileStorage{
     }
 
     /**
+     * Check to see if a bucket exists for a particular series
+     *
+     * @param Series $series The series we are looking up
+     * @return bool True if the bucket exists for the series, False otherwise
+     */
+    public function seriesFolderExists($series){
+
+        $bucketName = $series->getFullSeriesPath();
+
+        return $this->folderExists($bucketName);
+    }
+
+    /**
+     * Check to see if a bucket exists for a particular season of a series
+     *
+     * @param Series $series The series we are looking up
+     * @param string $seasonNum The specific season we are looking up
+     * @return bool True if the bucket exists for the series, False otherwise
+     */
+    public function seasonFolderExists($series, $seasonNum){
+
+        $seriesFolder = $series->getFullSeriesPath();
+        $seasonFolder = 'season_' . $seasonNum;
+
+        $bucketName = $seriesFolder . $seasonFolder . '/';
+
+        return $this->folderExists($bucketName);
+    }
+
+    /**
      * Upload a video to the S3 service. The video will be on our server and
      * we will then need to add it to the appropriate bucket in S3. The name of
      * the video will change when we upload it to S3.
@@ -249,37 +279,5 @@ class S3 implements FileStorage{
         ));
 
         return !$this->s3Client->doesObjectExist($folderName, $key);
-    }
-
-
-
-    /**
-     * Check to see if a bucket exists for a particular series
-     *
-     * @param Series $series The series we are looking up
-     * @return bool True if the bucket exists for the series, False otherwise
-     */
-    public function seriesFolderExists($series){
-
-        $bucketName = $series->getFullSeriesPath();
-
-        return $this->folderExists($bucketName);
-    }
-
-    /**
-     * Check to see if a bucket exists for a particular season of a series
-     *
-     * @param Series $series The series we are looking up
-     * @param string $seasonNum The specific season we are looking up
-     * @return bool True if the bucket exists for the series, False otherwise
-     */
-    public function seasonFolderExists($series, $seasonNum){
-
-        $seriesFolder = $series->getFullSeriesPath();
-        $seasonFolder = 'season_' . $seasonNum;
-
-        $bucketName = $seriesFolder . $seasonFolder . '/';
-
-        return $this->folderExists($bucketName);
     }
 }
