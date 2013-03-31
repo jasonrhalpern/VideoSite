@@ -31,8 +31,9 @@ my-vacation.mp4, enter my-vacation.mp4.
 
 <div id='mediaplayer'></div>
 <script type="text/javascript">
+    var videoName = 'test_bucket/zz4.mp4';
     jwplayer('mediaplayer').setup({
-        file: "rtmp://s3raw4lrefidgj.cloudfront.net/cfx/st/test_bucket/y3.mp4",
+        file: "http://d3mqb4dst9xzk0.cloudfront.net/" + videoName,
         width: "720",
         height: "480"
     });
