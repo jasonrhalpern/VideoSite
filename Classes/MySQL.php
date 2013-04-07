@@ -203,8 +203,7 @@ class MySQL implements Database{
         $query->execute();
         $query->bind_result($id, $title, $desc, $created, $createdBy, $views, $length, $likes);
         if($query->fetch())
-            $episode->setVideoId($id);
-
+            $episode->getVideo()->setVideoId($id);
         else
             return false;
 

@@ -98,16 +98,8 @@ class Episode{
         return $this->video->getVideoId();
     }
 
-    public function setVideoId($videoId){
-        $this->video->setVideoId($videoId);
-    }
-
     public function getSubmitter(){
         return $this->video->getSubmitter();
-    }
-
-    public function setSubmitter($submitter){
-        $this->video->setSubmitter($submitter);
     }
 
     public function getVideo(){
