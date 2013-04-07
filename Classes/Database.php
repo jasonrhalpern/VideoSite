@@ -5,6 +5,7 @@
  * will include information about users, series, videos, etc.
  *
  * @author Jason Halpern
+ * @since 4/5/2013
  */
 
 interface Database
@@ -21,6 +22,15 @@ interface Database
     public function insertUser($user);
     public function deleteUser($user);
     public function userExists($user);
+
+    public function insertVideo($video);
+    public function deleteVideo($video);
+
+    public function insertEpisode($episode);
+    public function deleteEpisode($episode);
+
+    public function insertSeason($seriesId, $seasonNum, $description);
+    public function deleteSeason($seriesId, $seasonNum);
 
     public function insertSeries($series);
     public function deleteSeries($series);

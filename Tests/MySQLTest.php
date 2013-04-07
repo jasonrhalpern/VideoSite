@@ -7,6 +7,8 @@ require_once 'PHPUnit/Autoload.php';
 require_once dirname(__FILE__) . '/../Classes/MySQL.php';
 require_once dirname(__FILE__) . '/../Classes/User.php';
 require_once dirname(__FILE__) . '/../Classes/Series.php';
+require_once dirname(__FILE__) . '/../Classes/Video.php';
+require_once dirname(__FILE__) . '/../Classes/Episode.php';
 
 class MySQLTest extends PHPUnit_Framework_TestCase{
     protected $user;
@@ -48,5 +50,24 @@ class MySQLTest extends PHPUnit_Framework_TestCase{
         $failedSeries = new Series(1, 'The Crazies Are Out', 'Crazies just going crazy',
                                     'Mystery/Suspense', 1);
         $this->assertFalse($this->dbConnection->insertSeries($failedSeries));
+    }
+
+    public function testInsertVideo(){
+        $video = new Video('Hicks vss Gangstas booyah', 'battlezz of tha century', 1);
+        $this->assertTrue($this->dbConnection->insertVideo($video));
+
+        $video = HelperFunc::loadVideoByDetails($video->getTitle(), $video->getDescription());
+        $this->assertTrue($this->dbConnection->deleteVideo($video));
+    }
+
+    public function testInsertEpisode(){
+        $video = new Video('Hicks vss Gangstas booyah', 'battlezz of tha century', 1);
+        $episode = new Episode($video, 1, 1, 1);
+
+        $this->assertTrue($this->dbConnection->insertEpisode($episode));
+
+        $video = HelperFunc::loadVideoByDetails($video->getTitle(), $video->getDescription());
+        $episode = new Episode($video, 1, 1, 1);
+        $this->assertTrue($this->dbConnection->deleteEpisode($episode));
     }
 }

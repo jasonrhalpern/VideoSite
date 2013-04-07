@@ -3,6 +3,7 @@
  * This includes random functions that we will need throughout our system.
  *
  * @author Jason Halpern
+ * @since 4/5/2013
  */
 class HelperFunc{
 
@@ -30,6 +31,23 @@ class HelperFunc{
         $newPassword = strtolower($newPassword);
 
         return $newPassword;
+    }
+
+    /**
+     * WARNING: NEVER USE THIS. EVER.
+     */
+    public static function loadVideoByDetails($title, $description){
+
+        $video = new Video(null, null, null);
+        $query = $video->getDBConnection()->prepare("select * from video where title = ? and description = ?");
+        $query->bind_param("ss", $title, $description);
+
+        $video->getVideoInfo($query);
+
+        if(is_null($video->getTitle()))
+            return false;
+
+        return $video;
     }
 
 }

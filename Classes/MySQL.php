@@ -7,6 +7,7 @@
  * inserting/deleting users, series, video metadata, etc.
  *
  * @author Jason Halpern
+ * @since 4/5/2013
  */
 
 require_once('/home/simawatkinto/AppConfig.php');
@@ -147,6 +148,125 @@ class MySQL implements Database{
         $query->bind_param("s", $series->getTitle());
 
         return $this->dataExists($query);
+    }
+
+    /**
+     * Insert a new video into the database
+     *
+     * @param Video $video The video that we want to add to the database
+     * @return bool True if the video has been added to the DB, false otherwise
+     */
+    public function insertVideo($video){
+        $temp_id = 0;
+
+        $query = $this->dbh->prepare("insert into video values(?, ?, ?, ?, ?, ?, ?, ?)");
+        $query->bind_param("isssiiii", $temp_id, $video->getTitle(), $video->getDescription(),
+                                        $video->getPostedDate(), $video->getSubmitter(), $video->getViews(),
+                                        $video->getLength(), $video->getLikes());
+
+        return $this->isExecuted($query);
+    }
+
+    /**
+     * Delete a video from the database
+     *
+     * @param Video $video The video we want to delete from the database
+     * @return bool True if the video has been deleted, False otherwise
+     */
+    public function deleteVideo($video){
+        $query = $this->dbh->prepare("delete from video where video_id=?");
+        $query->bind_param("i", $video->getVideoId());
+
+        return $this->isExecuted($query);
+    }
+
+    /**
+     * Insert a new episode into the database
+     *
+     * @param Episode $episode The episode that we want to add to the database
+     * @return bool True if the episode has been added to the DB, false otherwise
+     */
+    public function insertEpisode($episode){
+
+        /* Need to add the video details to the database first */
+        if(!$this->insertVideo($episode->getVideo()))
+            return false;
+
+        /*
+         *  Need to get the ID of the video before adding the other details to our episode table.
+         *  We do this by getting the last video submitted by this producer, which will be this one.
+         *  There might be a cleaner way to do this next step.
+         */
+        $query = $this->dbh->prepare("select * from video where created_by = ? and created = ?
+                                        order by video_id DESC LIMIT 1");
+        $query->bind_param("is", $episode->getSubmitter(), DateHelper::currentDate());
+        $query->execute();
+        $query->bind_result($id, $title, $desc, $created, $createdBy, $views, $length, $likes);
+        if($query->fetch())
+            $episode->setVideoId($id);
+
+        else
+            return false;
+
+        /* need to close the connection since its bound to the result */
+        $this->dbh->close();
+        /* open a new connection */
+        $this->connect();
+
+        /* Now insert the details into the episode table */
+        $queryTwo = $this->dbh->prepare("insert into episode values(?, ?, ?, ?)");
+        $queryTwo->bind_param("iiii", $episode->getVideoId(), $episode->getSeriesId(),
+                                    $episode->getSeasonNumber(), $episode->getEpisodeNumber());
+
+        return $this->isExecuted($queryTwo);
+    }
+
+    /**
+     * Delete an episode from the database
+     *
+     * @param Episode $episode The episode we want to delete from the database
+     * @return bool True if the episode has been deleted, False otherwise
+     */
+    public function deleteEpisode($episode){
+
+        /* delete the data from the video table first */
+        if(!$this->deleteVideo($episode->getVideo()))
+            return false;
+
+        $query = $this->dbh->prepare("delete from episode where video_id = ?");
+        $query->bind_param("i", $episode->getVideoId());
+
+        return $this->isExecuted($query);
+    }
+
+    /**
+     * Insert a new season into the database
+     *
+     * @param int $seriesId The id of the series that we are adding a season to
+     * @param int $seasonNum The number of the new season
+     * @param string $description The description for the new season
+     * @return bool True if the season has been added to the DB, false otherwise
+     */
+    public function insertSeason($seriesId, $seasonNum, $description){
+
+        $query = $this->dbh->prepare("insert into season values(?, ?, ?)");
+        $query->bind_param("iis", $seriesId, $seasonNum, $description);
+
+        return $this->isExecuted($query);
+    }
+
+    /**
+     * Delete a season from the database
+     *
+     * @param int $seriesId The id of the series that we are deleting a season from
+     * @param int $seasonNum The number of the season that we are deleting
+     * @return bool True if the season has been deleted from the DB, false otherwise
+     */
+    public function deleteSeason($seriesId, $seasonNum){
+        $query = $this->dbh->prepare("delete from season where series_id = ? and season_num = ?");
+        $query->bind_param("ii", $seriesId, $seasonNum);
+
+        return $this->isExecuted($query);
     }
 
     /**

@@ -34,10 +34,10 @@ class SeriesTest extends PHPUnit_Framework_TestCase{
         $this->assertEquals($series->getDescription(), 'Two brothers go on a wilderness adventure');
 
         /* the next two series do not exist */
-        $seriesTwo = Series::loadSeriesById(1);
+        $seriesTwo = Series::loadSeriesById(-1);
         $this->assertFalse($seriesTwo);
 
-        $seriesThree = Series::loadSeriesById(7);
+        $seriesThree = Series::loadSeriesById(0);
         $this->assertFalse($seriesThree);
     }
 

@@ -1,6 +1,7 @@
 <?php
 /**
  * @author Jason Halpern
+ * @since 4/5/2013
  */
 
 class Competitor extends User

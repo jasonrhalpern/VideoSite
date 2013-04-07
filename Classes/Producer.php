@@ -5,6 +5,7 @@
  * a user with the additional power of managing productions.
  *
  * @author Jason Halpern
+ * @since 4/5/2013
  */
 
 require_once('User.php');

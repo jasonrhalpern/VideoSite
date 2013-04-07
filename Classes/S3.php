@@ -5,6 +5,7 @@
  * thumbnails, pictures and other series and user related files.
  *
  * @author Jason Halpern
+ * @since 4/5/2013
  */
 
 require_once('/home/simawatkinto/AppConfig.php');

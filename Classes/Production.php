@@ -4,6 +4,7 @@
  * types of Productions (i.e. Series, Competitions, etc).
  *
  * @author Jason Halpern
+ * @since 4/5/2013
  */
 
 require_once dirname(__FILE__) . '/../Classes/MySQL.php';
