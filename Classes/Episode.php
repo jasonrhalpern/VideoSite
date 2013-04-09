@@ -94,14 +94,6 @@ class Episode{
         $this->episodeNumber = $episodeNum;
     }
 
-    public function getVideoId(){
-        return $this->video->getVideoId();
-    }
-
-    public function getSubmitter(){
-        return $this->video->getSubmitter();
-    }
-
     public function getVideo(){
         return $this->video;
     }

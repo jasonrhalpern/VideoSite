@@ -69,5 +69,18 @@ class MySQLTest extends PHPUnit_Framework_TestCase{
         $video = HelperFunc::loadVideoByDetails($video->getTitle(), $video->getDescription());
         $episode = new Episode($video, 1, 1, 1);
         $this->assertTrue($this->dbConnection->deleteEpisode($episode));
+
+    }
+
+    public function testMostRecentVideoId(){
+        $video = new Video('Hicks vss Gangstas booyah', 'battlezz of tha century', 1);
+        $episode = new Episode($video, 1, 1, 1);
+        $this->assertTrue($this->dbConnection->insertEpisode($episode));
+
+        $video = HelperFunc::loadVideoByDetails($video->getTitle(), $video->getDescription());
+        $videoId = $this->dbConnection->mostRecentVideoId($video->getSubmitter());
+        $this->assertEquals($videoId, $video->getVideoId());
+        $this->assertTrue($this->dbConnection->deleteEpisode($episode));
+
     }
 }

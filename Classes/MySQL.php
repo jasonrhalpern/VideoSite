@@ -194,30 +194,36 @@ class MySQL implements Database{
 
         /*
          *  Need to get the ID of the video before adding the other details to our episode table.
-         *  We do this by getting the last video submitted by this producer, which will be this one.
-         *  There might be a cleaner way to do this next step.
+         *  We do this by getting the last video submitted by this producer, which is the video
+         *  we are looking for.
          */
-        $query = $this->dbh->prepare("select * from video where created_by = ? and created = ?
-                                        order by video_id DESC LIMIT 1");
-        $query->bind_param("is", $episode->getSubmitter(), DateHelper::currentDate());
+        $videoId = $this->mostRecentVideoId($episode->getVideo()->getSubmitter());
+        $episode->getVideo()->setVideoId($videoId);
+
+        /* Now insert the details into the episode table */
+        $query = $this->dbh->prepare("insert into episode values(?, ?, ?, ?)");
+        $query->bind_param("iiii", $episode->getVideo()->getVideoId(), $episode->getSeriesId(),
+                                    $episode->getSeasonNumber(), $episode->getEpisodeNumber());
+
+        return $this->isExecuted($query);
+    }
+
+    /**
+     * This gets the video ID of the last video that this user added.
+     *
+     * @param $userId
+     * @return int|bool The video ID if the video exists, false otherwise
+     */
+    public function mostRecentVideoId($userId){
+
+        $query = $this->dbh->prepare("select * from video where created_by = ? order by video_id DESC LIMIT 1");
+        $query->bind_param("i", $userId);
         $query->execute();
         $query->bind_result($id, $title, $desc, $created, $createdBy, $views, $length, $likes);
         if($query->fetch())
-            $episode->getVideo()->setVideoId($id);
+            return $id;
         else
             return false;
-
-        /* need to close the connection since its bound to the result */
-        $this->dbh->close();
-        /* open a new connection */
-        $this->connect();
-
-        /* Now insert the details into the episode table */
-        $queryTwo = $this->dbh->prepare("insert into episode values(?, ?, ?, ?)");
-        $queryTwo->bind_param("iiii", $episode->getVideoId(), $episode->getSeriesId(),
-                                    $episode->getSeasonNumber(), $episode->getEpisodeNumber());
-
-        return $this->isExecuted($queryTwo);
     }
 
     /**
@@ -233,7 +239,7 @@ class MySQL implements Database{
             return false;
 
         $query = $this->dbh->prepare("delete from episode where video_id = ?");
-        $query->bind_param("i", $episode->getVideoId());
+        $query->bind_param("i", $episode->getVideo()->getVideoId());
 
         return $this->isExecuted($query);
     }
