@@ -162,15 +162,22 @@ class Series extends Production
      * the season number in the database and creating a new folder in our filesystem
      * to hold the video files for the season.
      *
+     * @param string $seasonDescription The description of the new season
      * @return bool True if a new season was created, False otherwise.
      */
-    public function addNewSeason(){
+    public function addNewSeason($seasonDescription){
 
-        /* increment the season number for this series in the database */
+        /* get the number of the new season */
         $newSeasonNum = $this->getSeasonNum() + 1;
         $this->setSeasonNum($newSeasonNum);
+
+        /* add the new season to the database */
+        if(!$this->db->insertSeason($this->getId(), $this->getSeasonNum(), $seasonDescription))
+            return false;
+
+        /* increment the season number for this series in the database */
         $query = $this->getDBConnection()->prepare("update series set seasons = ? where series_id = ?");
-        $query->bind_param("ii", $newSeasonNum, $this->getId());
+        $query->bind_param("ii", $this->getSeasonNum(), $this->getId());
 
         /* create a new folder to hold the video files for the new season */
         $isFolderCreated = $this->fileStorage->createSeasonFolder($this);

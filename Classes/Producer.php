@@ -29,9 +29,9 @@ class Producer extends User{
      * @param Series $series The series for which we are creating a new season
      * @return bool True if a new season has been created, False otherwise
      */
-    public function createNewSeason($series){
+    public function createNewSeason($series, $seasonDescription){
 
-        return $series->addNewSeason();
+        return $series->addNewSeason($seasonDescription);
     }
 
     /**

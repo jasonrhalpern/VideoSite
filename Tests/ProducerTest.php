@@ -48,15 +48,17 @@ class ProducerTest extends PHPUnit_Framework_TestCase{
 
         $series = Series::loadSeriesByTitle('Figaro Saves The World Part Deux');
 
-        $this->producer->createNewSeason($series);
+        $this->producer->createNewSeason($series, 'Figaro arrives for fun goodness');
         $series = Series::loadSeriesByTitle('Figaro Saves The World Part Deux');
         $this->assertEquals(2, $series->getSeasonNum());
 
-        $this->producer->createNewSeason($series);
+        $this->producer->createNewSeason($series, 'The return of Figaro');
         $series = Series::loadSeriesByTitle('Figaro Saves The World Part Deux');
         $this->assertEquals(3, $series->getSeasonNum());
 
         $this->assertTrue($this->dbConnection->deleteSeries($this->series));
+        $this->assertTrue($this->dbConnection->deleteSeason($series->getId(), 2));
+        $this->assertTrue($this->dbConnection->deleteSeason($series->getId(), 3));
         $this->assertTrue($this->s3Client->deleteSeasonFolder($series, 1));
         $this->assertTrue($this->s3Client->deleteSeasonFolder($series, 2));
         $this->assertTrue($this->s3Client->deleteSeasonFolder($series, 3));

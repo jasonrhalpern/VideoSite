@@ -9,6 +9,8 @@
  * @author Jason Halpern
  * @since 4/5/2013
  */
+require_once('S3.php');
+require_once('MySQL.php');
 
 abstract class Person
 {

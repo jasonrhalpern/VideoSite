@@ -9,6 +9,9 @@
  * @author Jason Halpern
  * @since 4/5/2013
  */
+
+require_once('Video.php');
+
 class Episode{
 
     protected $video; //Video object

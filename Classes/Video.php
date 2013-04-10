@@ -8,6 +8,8 @@
  * @since 4/5/2013
  */
 
+require_once('DateHelper.php');
+
 class Video{
 
     protected $videoId;

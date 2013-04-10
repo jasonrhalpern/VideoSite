@@ -75,20 +75,23 @@ class SeriesTest extends PHPUnit_Framework_TestCase{
         $this->assertTrue($this->dbConnection->insertSeries($series));
         $series = Series::loadSeriesByTitle('The End of The World Is Awesomme');
 
-        $this->assertTrue($series->addNewSeason());
+        $this->assertTrue($series->addNewSeason('The end of the world approaches'));
         $series = Series::loadSeriesByTitle('The End of The World Is Awesomme');
         $this->assertEquals(2, $series->getSeasonNum());
 
-        $this->assertTrue($series->addNewSeason());
+        $this->assertTrue($series->addNewSeason('The end of the world is here'));
         $series = Series::loadSeriesByTitle('The End of The World Is Awesomme');
         $this->assertEquals(3, $series->getSeasonNum());
 
-        $this->assertTrue($series->addNewSeason());
+        $this->assertTrue($series->addNewSeason('The end of the world, is that it?'));
         $this->assertEquals(4, $series->getSeasonNum());
 
         $this->assertTrue($this->fileStorage->deleteSeasonFolder($series, 2));
         $this->assertTrue($this->fileStorage->deleteSeasonFolder($series, 3));
         $this->assertTrue($this->fileStorage->deleteSeasonFolder($series, 4));
+        $this->assertTrue($this->dbConnection->deleteSeason($series->getId(), 2));
+        $this->assertTrue($this->dbConnection->deleteSeason($series->getId(), 3));
+        $this->assertTrue($this->dbConnection->deleteSeason($series->getId(), 4));
         $this->dbConnection->deleteSeries($series);
 
     }

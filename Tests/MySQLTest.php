@@ -72,6 +72,13 @@ class MySQLTest extends PHPUnit_Framework_TestCase{
 
     }
 
+    public function testInsertSeason(){
+        $this->assertTrue($this->dbConnection->insertSeason(1, 1, 'Thiiss season rules'));
+        $this->assertFalse($this->dbConnection->insertSeason(1, 1, 'Thiiss season rules'));
+        $this->assertTrue($this->dbConnection->deleteSeason(1, 1));
+
+    }
+
     public function testMostRecentVideoId(){
         $video = new Video('Hicks vss Gangstas booyah', 'battlezz of tha century', 1);
         $episode = new Episode($video, 1, 1, 1);
