@@ -6,6 +6,8 @@
 require_once dirname(__FILE__) . '/../Classes/Producer.php';
 require_once dirname(__FILE__) . '/../Classes/Series.php';
 require_once dirname(__FILE__) . '/../Classes/S3.php';
+require_once dirname(__FILE__) . '/../Classes/Video.php';
+require_once dirname(__FILE__) . '/../Classes/Episode.php';
 
 class ProducerTest extends PHPUnit_Framework_TestCase{
 
@@ -80,4 +82,18 @@ class ProducerTest extends PHPUnit_Framework_TestCase{
         $this->assertTrue($this->s3Client->deleteSeriesFolder($this->series));
     }
 
+    public function testAddEpisodeToSeries(){
+        $this->assertTrue($this->producer->createSeries($this->series));
+        $series = Series::loadSeriesByTitle('Figaro Saves The World Part Deux');
+
+        $video = new Video('Hicks vss Gangstas booyah', 'battlezz of tha century', 1);
+        $episode = new Episode($video, $series->getId(), $series->getSeasonNum(),
+                                ($series->getNumEpisodesInSeason($series->getSeasonNum()) + 1));
+
+        $this->producer->addEpisodeToSeries($series, $video, '/var/www/Tests/TestFiles/test.mov');
+        $this->assertTrue($this->dbConnection->deleteEpisode($episode));
+        $this->assertTrue($this->dbConnection->deleteSeries($this->series));
+        $this->assertTrue($this->s3Client->deleteSeasonFolder($this->series, 1));
+        $this->assertTrue($this->s3Client->deleteSeriesFolder($this->series));
+    }
 }

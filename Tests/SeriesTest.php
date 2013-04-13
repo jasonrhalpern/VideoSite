@@ -58,7 +58,7 @@ class SeriesTest extends PHPUnit_Framework_TestCase{
     }
 
     public function testGetFolderName(){
-        $folder = $this->seriesOne->getFolderName();
+        $folder = $this->seriesOne->getSeriesFolderName();
         $this->assertEquals('Winkle_and_Dinkle_Go_West', $folder);
     }
 

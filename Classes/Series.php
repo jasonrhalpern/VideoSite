@@ -40,7 +40,7 @@ class Series extends Production
         $query = $series->getDBConnection()->prepare("select * from series where series_id = ?");
         $query->bind_param("s", $seriesId);
 
-        $series->getSeriesInfo($query);
+        MySQL::getSeriesInfo($series, $query);
 
         if(is_null($series->getTitle()))
             return false;
@@ -60,33 +60,12 @@ class Series extends Production
         $query = $series->getDBConnection()->prepare("select * from series where title = ?");
         $query->bind_param("s", $seriesTitle);
 
-        $series->getSeriesInfo($query);
+        MySQL::getSeriesInfo($series, $query);
 
         if(is_null($series->getId()))
             return false;
 
         return $series;
-    }
-
-    /**
-     * Execute a query about a Series and then load all the details of the series that
-     * match the query
-     *
-     * @param mysqli $query The query we are executing
-     */
-    public function getSeriesInfo($query){
-        $query->execute();
-        $query->bind_result($id, $creatorId, $createdDate, $seasonNumber, $title, $description, $category);
-        if($query->fetch()){
-            $this->setId($id);
-            $this->setCreatorId($creatorId);
-            $this->setCreatedDate($createdDate);
-            $this->setSeasonNum($seasonNumber);
-            $this->setTitle($title);
-            $this->setDescription($description);
-            $this->setCategory($category);
-        }
-
     }
 
     public function getCreatedDate(){
@@ -134,10 +113,11 @@ class Series extends Production
     /**
      * Return the name of the folder that stores all videos for this series.
      * Whitespace is replaced by underscores because S3 buckets cannot have whitespace.
+     * This is just the folder name for a series, not the full path to the series folder.
      *
      * @return string The bucket name for this series
      */
-    public function getFolderName(){
+    public function getSeriesFolderName(){
         /* replace the whitespace with underscores to get the right folder */
         return str_replace(' ', '_', $this->getTitle());
     }
@@ -150,7 +130,64 @@ class Series extends Production
      * @return string The full path to the bucket for this series.
      */
     public function getFullSeriesPath(){
-        return AppConfig::getS3Root() . $this->getFolderName() . '/';
+        return AppConfig::getS3Root() . $this->getSeriesFolderName() . '/';
+    }
+
+    /**
+     * This function returns the path to a folder for a specific season of the series.
+     *
+     * @param int $seasonNumber
+     */
+    public function getSeasonFolderPath($seasonNumber){
+        $seriesFolder = $this->getFullSeriesPath();
+        $seasonFolder = 'season_' . $seasonNumber;
+
+        $bucketName = $seriesFolder . $seasonFolder;
+
+        return $bucketName;
+    }
+
+    /**
+     * Get the episode key for the original video.
+     *
+     * @param int $seasonNum The season number
+     * @param int $episodeNum The episode number
+     * @return string The key to access the original file for the episode
+     */
+    public function getEpisodeKey($seasonNum, $episodeNum){
+        return $this->getSeriesFolderName() . '/' . 'season_' . $seasonNum . '/' . $episodeNum;
+    }
+
+    /**
+     * Get the episode key for the standard definition video.
+     *
+     * @param int $seasonNum The season number
+     * @param int $episodeNum The episode number
+     * @return string The key to access the SD episode
+     */
+    public function getSDEpisodeKey($seasonNum, $episodeNum){
+        return $this->getEpisodeKey($seasonNum, $episodeNum) . '_SD.mp4';
+    }
+
+    /**
+     * Get the episode key for the high definition video.
+     *
+     * @param int $seasonNum The season number
+     * @param int $episodeNum The episode number
+     * @return string The key to access the HD episode
+     */
+    public function getHDEpisodeKey($seasonNum, $episodeNum){
+        return $this->getEpisodeKey($seasonNum, $episodeNum) . '_HD.mp4';
+    }
+
+    /**
+     * Get the thumbnail folder for a specific episode
+     *
+     * @param int $seasonNum The season number
+     * @param int $episodeNum The episode number
+     */
+    public function getThumbnailFolder($seasonNum, $episodeNum){
+        return $this->getEpisodeKey($seasonNum, $episodeNum);
     }
 
     public function getCrew(){
@@ -183,6 +220,82 @@ class Series extends Production
         $isFolderCreated = $this->fileStorage->createSeasonFolder($this);
 
         return ($this->db->isExecuted($query) && $isFolderCreated);
+    }
+
+    /**
+     * Find the number of episodes that exist for a given season in this series
+     *
+     * @param int $seasonNumber The season number
+     * @return int|bool The number of episodes in the season, false otherwise
+     */
+    public function getNumEpisodesInSeason($seasonNumber){
+
+        $query = $this->getDBConnection()->prepare("select COUNT(*) from episode where
+                                                    series_id = ? and season_num = ?");
+        $query->bind_param("ii", $this->getId(), $seasonNumber);
+        $query->execute();
+        $query->bind_result($numberOfEpisodes);
+        if($query->fetch()){
+            return $numberOfEpisodes;
+        }
+
+        return false;
+    }
+
+    /**
+     * Add a episode to a series.
+     *
+     * Adding an episode to a series has several steps. First that episode needs to be
+     * created in the database, then we need to upload the file to the correct folder
+     * for this series, then we need to transcode the file to the appropriate file formats.
+     * The transcoder also handles the creation of thumbnails.
+     *
+     * @param Video $videoObject The video object representing the video for this episode
+     * @param string $fileName The file we are uploading to our file storage.
+     */
+    public function addEpisode($videoObject, $fileName){
+
+        /* Obtain the episode number for this new episode then insert the episode into the database */
+        $episodeNumber = $this->getNumEpisodesInSeason($this->getSeasonNum()) + 1;
+        $episode = new Episode($videoObject, $this->getId(), $this->getSeasonNum(), $episodeNumber);
+        if(!$this->db->insertEpisode($episode))
+            return false;
+
+        /**
+         *  Now we need to upload the actual video file representing the episode from our
+         *  local filesystem to the remote file storage. The episode number is the name of
+         *  the file and it is stored in the season folder within that series.
+         */
+        $seasonFolder = $this->getSeasonFolderPath($this->getSeasonNum());
+        $this->fileStorage->uploadVideo($fileName, $episodeNumber, $seasonFolder);
+
+        /* Transcode the file that we just uploaded */
+        $originalFile = $this->getEpisodeKey($this->getSeasonNum(), $episodeNumber);
+        /* create the standard definition (SD) video file */
+        $standardDefinitionFile = $this->getSDEpisodeKey($this->getSeasonNum(), $episodeNumber);
+        $this->transcoder->transcodeVideo($originalFile, $standardDefinitionFile,
+                                            $this->getThumbnailFolder($this->getSeasonNum(), $episodeNumber),
+                                            '1351620000000-000020'); //preset
+        /* create the high definition (HD) video file */
+        $highDefinitionFile = $this->getHDEpisodeKey($this->getSeasonNum(), $episodeNumber);
+        $this->transcoder->transcodeVideo($originalFile, $highDefinitionFile,
+                                            $this->getThumbnailFolder($this->getSeasonNum(), $episodeNumber),
+                                            '1351620000000-000010'); //preset
+
+        /*$this->fileStorage->waitUntilTranscodingCompletes($this->getSDEpisodeKey($this->getSeasonNum(),
+                                                            $episodeNumber));
+        $this->fileStorage->waitUntilTranscodingCompletes($this->getHDEpisodeKey($this->getSeasonNum(),
+                                                            $episodeNumber));*/
+    }
+
+    public function addMainImage($image){
+
+        /*if(!$this->fileStorage->folderExists()){
+
+        }*/
+        //see if series image already exists
+        //if it does then delete it and add a new one
+        //otherwise create folder for image and add image to folder
     }
 
     /**

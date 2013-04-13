@@ -22,12 +22,15 @@ interface Database
     public function insertUser($user);
     public function deleteUser($user);
     public function userExists($user);
+    public static function getUserInfo($user, $query);
 
     public function insertVideo($video);
     public function deleteVideo($video);
+    public static function getVideoInfo($video, $query);
 
     public function insertEpisode($episode);
     public function deleteEpisode($episode);
+    public static function getEpisodeInfo($episode, $query);
 
     public function insertSeason($seriesId, $seasonNum, $description);
     public function deleteSeason($seriesId, $seasonNum);
@@ -35,6 +38,7 @@ interface Database
     public function insertSeries($series);
     public function deleteSeries($series);
     public function seriesExists($series);
+    public static function getSeriesInfo($series, $query);
 
 }
 

@@ -8,6 +8,7 @@
  */
 
 require_once dirname(__FILE__) . '/../Classes/MySQL.php';
+require_once dirname(__FILE__) . '/../Classes/Transcoder.php';
 
 abstract class Production{
 
@@ -18,12 +19,14 @@ abstract class Production{
     protected $tags; //array
     protected $db;
     protected $fileStorage;
+    protected $transcoder;
 
     public function __construct($title, $description){
         $this->title = $title;
         $this->description = $description;
         $this->db = new MySQL();
         $this->fileStorage = new S3();
+        $this->transcoder = new Transcoder();
     }
 
     public function addVideo()

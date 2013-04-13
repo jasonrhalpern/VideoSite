@@ -42,7 +42,7 @@ class HelperFunc{
         $query = $video->getDBConnection()->prepare("select * from video where title = ? and description = ?");
         $query->bind_param("ss", $title, $description);
 
-        $video->getVideoInfo($query);
+        MYSQL::getVideoInfo($video, $query);
 
         if(is_null($video->getTitle()))
             return false;

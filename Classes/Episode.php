@@ -48,29 +48,12 @@ class Episode{
         $query = $episode->video->getDBConnection()->prepare("select * from episode where video_id = ?");
         $query->bind_param("i", $video->getVideoId());
 
-        $episode->getEpisodeInfo($query);
+        MySQL::getEpisodeInfo($episode, $query);
 
         if(is_null($episode->getSeriesId()))
             return false;
 
         return $episode;
-    }
-
-    /**
-     * Execute a query about a Episode and then load all the details of the episode that
-     * match the query
-     *
-     * @param mysqli $query The query we are executing
-     */
-    public function getEpisodeInfo($query){
-        $query->execute();
-        $query->bind_result($videoId, $seriesId, $seasonNumber, $episodeNumber);
-        if($query->fetch()){
-            $this->setSeriesId($seriesId);
-            $this->setSeasonNumber($seasonNumber);
-            $this->setEpisodeNumber($episodeNumber);
-        }
-
     }
 
     public function getSeriesId(){

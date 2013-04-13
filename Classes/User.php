@@ -81,14 +81,7 @@ class User extends Person{
     public function loadDetails(){
         $query = $this->getDBConnection()->prepare("select * from users where email = ? and password = ?");
         $query->bind_param("ss", $this->getEmail(), $this->getEncryptedPassword());
-        $query->execute();
-        $query->bind_result($id, $username, $name, $email, $password, $joined);
-        if($query->fetch()){
-            $this->setId($id);
-            $this->setUsername($username);
-            $this->setName($name);
-            $this->setJoined($joined);
-        }
+        MySQL::getUserInfo($this, $query);
     }
 
     /**

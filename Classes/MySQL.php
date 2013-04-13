@@ -104,6 +104,24 @@ class MySQL implements Database{
     }
 
     /**
+     * Load all of the user details from the database
+     *
+     * @param User $user The user whose details we are loading
+     * @param mysqli $query The query that is being executed
+     */
+    public static function getUserInfo($user, $query){
+
+        $query->execute();
+        $query->bind_result($id, $username, $name, $email, $password, $joined);
+        if($query->fetch()){
+            $user->setId($id);
+            $user->setUsername($username);
+            $user->setName($name);
+            $user->setJoined($joined);
+        }
+    }
+
+    /**
      * Insert a new series into the database
      *
      * @param Series $series The series that we want to add to the database
@@ -151,6 +169,28 @@ class MySQL implements Database{
     }
 
     /**
+     * Execute a query about a Series and then load all the details of the series that
+     * match the query
+     *
+     * @param Series $series The series whose details we are loading
+     * @param mysqli $query The query we are executing
+     */
+    public static function getSeriesInfo($series, $query){
+        $query->execute();
+        $query->bind_result($id, $creatorId, $createdDate, $seasonNumber, $title, $description, $category);
+        if($query->fetch()){
+            $series->setId($id);
+            $series->setCreatorId($creatorId);
+            $series->setCreatedDate($createdDate);
+            $series->setSeasonNum($seasonNumber);
+            $series->setTitle($title);
+            $series->setDescription($description);
+            $series->setCategory($category);
+        }
+
+    }
+
+    /**
      * Insert a new video into the database
      *
      * @param Video $video The video that we want to add to the database
@@ -178,6 +218,29 @@ class MySQL implements Database{
         $query->bind_param("i", $video->getVideoId());
 
         return $this->isExecuted($query);
+    }
+
+    /**
+     * Execute a query about a video and then load all the details of the video that
+     * match the query
+     *
+     * @param Video $video The video whose details we are loading
+     * @param mysqli $query The query we are executing
+     */
+    public static function getVideoInfo($video, $query){
+        $query->execute();
+        $query->bind_result($id, $title, $description, $createdDate, $createdBy, $views, $length, $likes);
+        if($query->fetch()){
+            $video->setVideoId($id);
+            $video->setTitle($title);
+            $video->setDescription($description);
+            $video->setPostedDate($createdDate);
+            $video->setSubmitter($createdBy);
+            $video->setViews($views);
+            $video->setLength($length);
+            $video->setLikes($likes);
+        }
+
     }
 
     /**
@@ -242,6 +305,24 @@ class MySQL implements Database{
         $query->bind_param("i", $episode->getVideo()->getVideoId());
 
         return $this->isExecuted($query);
+    }
+
+    /**
+     * Execute a query about a Episode and then load all the details of the episode that
+     * match the query
+     *
+     * @param Episode $episode The episode whose details we are loading
+     * @param mysqli $query The query we are executing
+     */
+    public static function getEpisodeInfo($episode, $query){
+        $query->execute();
+        $query->bind_result($videoId, $seriesId, $seasonNumber, $episodeNumber);
+        if($query->fetch()){
+            $episode->setSeriesId($seriesId);
+            $episode->setSeasonNumber($seasonNumber);
+            $episode->setEpisodeNumber($episodeNumber);
+        }
+
     }
 
     /**

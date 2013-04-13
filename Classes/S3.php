@@ -36,6 +36,10 @@ class S3 implements FileStorage{
                             ));
     }
 
+    public function getS3Client(){
+        return $this->s3Client;
+    }
+
     /**
      * Create a folder in S3
      *

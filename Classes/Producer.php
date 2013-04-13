@@ -56,8 +56,15 @@ class Producer extends User{
         return false;
     }
 
-    public function addVidToSeries()
-    {
+    public function addEpisodeToSeries($series, $videoObject, $fileName){
+
+        $series->addEpisode($videoObject, $fileName);
+
+    }
+
+    public function addSeriesImage($series, $image){
+        $series->addMainImage($image);
+
     }
 
     public function submitPilot()

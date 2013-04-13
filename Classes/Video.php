@@ -49,34 +49,12 @@ class Video{
         $query = $video->getDBConnection()->prepare("select * from video where video_id = ?");
         $query->bind_param("i", $videoId);
 
-        $video->getVideoInfo($query);
+        MYSQL::getVideoInfo($video, $query);
 
         if(is_null($video->getTitle()))
             return false;
 
         return $video;
-    }
-
-    /**
-     * Execute a query about a video and then load all the details of the video that
-     * match the query
-     *
-     * @param mysqli $query The query we are executing
-     */
-    public function getVideoInfo($query){
-        $query->execute();
-        $query->bind_result($id, $title, $description, $createdDate, $createdBy, $views, $length, $likes);
-        if($query->fetch()){
-            $this->setVideoId($id);
-            $this->setTitle($title);
-            $this->setDescription($description);
-            $this->setPostedDate($createdDate);
-            $this->setSubmitter($createdBy);
-            $this->setViews($views);
-            $this->setLength($length);
-            $this->setLikes($likes);
-        }
-
     }
 
     public function joinCompetition()
