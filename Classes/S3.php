@@ -86,7 +86,7 @@ class S3 implements FileStorage{
      */
     public function createSeriesFolder($series){
 
-        $bucketName = $series->getFullSeriesPath();
+        $bucketName = $this->getFullSeriesPath($series);
 
         /* create a bucket in s3 for the series */
         $this->createFolder($bucketName);
@@ -105,7 +105,7 @@ class S3 implements FileStorage{
      */
     public function deleteSeriesFolder($series){
 
-        $bucketName = $series->getFullSeriesPath();
+        $bucketName = $this->getFullSeriesPath($series);
 
         /* delete a bucket in s3 for the series */
         $this->deleteFolder($bucketName);
@@ -122,7 +122,7 @@ class S3 implements FileStorage{
      */
     public function createSeasonFolder($series){
 
-        $seriesFolder = $series->getFullSeriesPath();
+        $seriesFolder = $this->getFullSeriesPath($series);
         $seasonFolder = 'season_' . $series->getSeasonNum();
 
         $bucketName = $seriesFolder . $seasonFolder . '/';
@@ -143,7 +143,7 @@ class S3 implements FileStorage{
      */
     public function deleteSeasonFolder($series, $seasonNumber){
 
-        $seriesFolder = $series->getFullSeriesPath();
+        $seriesFolder = $this->getFullSeriesPath($series);
         $seasonFolder = 'season_' . $seasonNumber;
 
         $bucketName = $seriesFolder . $seasonFolder . '/';
@@ -163,7 +163,7 @@ class S3 implements FileStorage{
      */
     public function seriesFolderExists($series){
 
-        $bucketName = $series->getFullSeriesPath();
+        $bucketName = $this->getFullSeriesPath($series);
 
         return $this->folderExists($bucketName);
     }
@@ -177,7 +177,7 @@ class S3 implements FileStorage{
      */
     public function seasonFolderExists($series, $seasonNum){
 
-        $seriesFolder = $series->getFullSeriesPath();
+        $seriesFolder = $this->getFullSeriesPath($series);
         $seasonFolder = 'season_' . $seasonNum;
 
         $bucketName = $seriesFolder . $seasonFolder . '/';
@@ -285,4 +285,119 @@ class S3 implements FileStorage{
 
         return !$this->s3Client->doesObjectExist($folderName, $key);
     }
+
+    /**
+     * Get the path of the folder that holds the main image for a series
+     *
+     * @param Series $series The series
+     */
+    public function getSeriesImagePath($series){
+        return $this->getFullSeriesPath($series) . 'series_image';
+    }
+
+    /**
+     * Return the name of the folder that stores all videos for this series.
+     * Whitespace is replaced by underscores because S3 buckets cannot have whitespace.
+     * This is just the folder name for a series, not the full path to the series folder.
+     *
+     * @param Series $series The series
+     * @return string The bucket name for this series
+     */
+    public function getSeriesFolderName($series){
+        /* replace the whitespace with underscores to get the right folder */
+        return str_replace(' ', '_', $series->getTitle());
+    }
+
+    /**
+     * This is the full path for a bucket of a series. It is different from just
+     * the bucket name in that it also includes the root S3 bucket. The full bucket
+     * path is needed to correctly add/remove files and folders from S3.
+     *
+     * @param Series $series The series
+     * @return string The full path to the bucket for this series.
+     */
+    public function getFullSeriesPath($series){
+        return AppConfig::getS3Root() . $this->getSeriesFolderName($series) . '/';
+    }
+
+    /**
+     * This function returns the path to a folder for a specific season of the series.
+     *
+     * @param Series $series The series
+     * @param int $seasonNumber
+     */
+    public function getSeasonFolderPath($series, $seasonNumber){
+        $seriesFolder = $this->getFullSeriesPath($series);
+        $seasonFolder = 'season_' . $seasonNumber;
+
+        $bucketName = $seriesFolder . $seasonFolder;
+
+        return $bucketName;
+    }
+
+    /**
+     * Get the episode key for the original video file. This is the full path to that file.
+     *
+     * @param Series $series
+     * @param int $seasonNum The season number
+     * @param int $episodeNum The episode number
+     * @return string The key to access the original file for the episode
+     */
+    public function getEpisodeKey($series, $seasonNum, $episodeNum){
+        return $this->getSeriesFolderName($series) . '/' . 'season_' . $seasonNum . '/' . $episodeNum;
+    }
+
+    /**
+     * Get the episode key for the standard definition video file. This is the full path to that file.
+     *
+     * @param Series $series The series
+     * @param int $seasonNum The season number
+     * @param int $episodeNum The episode number
+     * @return string The key to access the SD episode
+     */
+    public function getSDEpisodeKey($series, $seasonNum, $episodeNum){
+        return $this->getEpisodeKey($series, $seasonNum, $episodeNum) . '_SD.mp4';
+    }
+
+    /**
+     * Get the episode key for the high definition video file. This is the full path to that file.
+     *
+     * @param Series $series The series
+     * @param int $seasonNum The season number
+     * @param int $episodeNum The episode number
+     * @return string The key to access the HD episode
+     */
+    public function getHDEpisodeKey($series, $seasonNum, $episodeNum){
+        return $this->getEpisodeKey($series, $seasonNum, $episodeNum) . '_HD.mp4';
+    }
+
+    /**
+     * Get the thumbnail folder for a specific episode. This is the full path to that folder.
+     *
+     * @param Series $series The series
+     * @param int $seasonNum The season number
+     * @param int $episodeNum The episode number
+     */
+    public function getThumbnailFolder($series, $seasonNum, $episodeNum){
+        return $this->getEpisodeKey($series, $seasonNum, $episodeNum) . '_thumbnails/';
+    }
+
+    /**
+     * Wait until a file exists before doing anything else. This hangs until it has been
+     * verified that the object exists in S3
+     *
+     * @param string $folder The folder in which the file will exist
+     * @param string $key The name of the file
+     */
+    public function waitUntilFileExists($folder, $fileName){
+
+        $this->s3Client->waitUntilObjectExists(array(
+            'Key' => $fileName,
+            'Bucket' => $folder
+        ));
+
+        return true;
+    }
+
+
 }

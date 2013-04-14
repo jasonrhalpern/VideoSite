@@ -55,7 +55,7 @@ class Transcoder {
 
         $output = array(
             'Key'    => $destinationFile,
-            'ThumbnailPattern'  => $thumbnailFolder . '_thumb-{count}',
+            'ThumbnailPattern'  => $thumbnailFolder . '{count}',
             'Rotate'  => 'auto',
             'PresetId' => $videoPreset
         );

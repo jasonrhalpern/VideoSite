@@ -58,12 +58,12 @@ class SeriesTest extends PHPUnit_Framework_TestCase{
     }
 
     public function testGetFolderName(){
-        $folder = $this->seriesOne->getSeriesFolderName();
+        $folder = $this->fileStorage->getSeriesFolderName($this->seriesOne);
         $this->assertEquals('Winkle_and_Dinkle_Go_West', $folder);
     }
 
     public function testGetFullSeriesPath(){
-        $fullPath = $this->seriesOne->getFullSeriesPath();
+        $fullPath = $this->fileStorage->getFullSeriesPath($this->seriesOne);
         $this->assertEquals('assets.gookeyz.com/Winkle_and_Dinkle_Go_West/', $fullPath);
     }
 
@@ -119,4 +119,15 @@ class SeriesTest extends PHPUnit_Framework_TestCase{
         $this->assertTrue($this->dbConnection->deleteUser($userTwo));
         $this->assertTrue($this->dbConnection->deleteSeries($series));
     }
+
+    public function testAddMainImage(){
+        $imagePath = '/var/www/Tests/TestFiles/test.jpg';
+        $series = new Series(1, 'The End of The World Is Awesomme', 'It all ends tonight and we are ready to party',
+            'Sci-Fi/Fantasy', 1);
+        $this->assertTrue($series->addMainImage($imagePath));
+
+        $imageFolder = $this->fileStorage->getSeriesImagePath($series);
+        $this->assertTrue($this->fileStorage->deleteImage($imageFolder, 'image'));
+    }
+
 }
