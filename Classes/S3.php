@@ -243,6 +243,29 @@ class S3 implements FileStorage{
     }
 
     /**
+     * Delete an episode from a series. This deletes the original video file, the
+     * standard definition video file, the high definition video file and the
+     * thumbnails for the videos.
+     *
+     * @param Series $series The series
+     * @param int $seasonNumber The season of the series
+     * @param int $episodeNumber The episode in the season
+     */
+    public function deleteEpisode($series, $seasonNumber, $episodeNumber){
+        $seasonFolder = $this->getSeasonFolderPath($series, $seasonNumber);
+        $this->deleteVideo($seasonFolder, $episodeNumber);
+        $this->deleteVideo($seasonFolder, $episodeNumber . '_HD.mp4');
+        $this->deleteVideo($seasonFolder, $episodeNumber . '_SD.mp4');
+
+        $thumbnailFolder = substr($this->getThumbnailFolder($series, $seasonNumber, $episodeNumber), 0, -1);
+        $this->deleteImage(AppConfig::getS3Root() . $thumbnailFolder, '00001.png');
+        $this->deleteImage(AppConfig::getS3Root() . $thumbnailFolder, '00002.png');
+        $this->deleteImage(AppConfig::getS3Root() . $thumbnailFolder, '00003.png');
+        $this->deleteImage(AppConfig::getS3Root() . $thumbnailFolder, '00004.png');
+
+    }
+
+    /**
      * Upload an image to the S3 service. The image will be on our server and
      * we will then need to add it to the appropriate bucket in S3. The name of
      * the image will change when we upload it to S3.

@@ -99,7 +99,8 @@ class ProducerTest extends PHPUnit_Framework_TestCase{
         $this->assertTrue($this->s3Client->waitUntilFileExists($this->s3Client->getSeasonFolderPath($series, 1) , '1_HD.mp4'));
         $this->assertTrue($this->s3Client->waitUntilFileExists($this->s3Client->getSeasonFolderPath($series, 1) , '1_SD.mp4'));
 
-
-
+        $this->s3Client->deleteEpisode($series, $series->getSeasonNum(), 1);
+        $this->s3Client->deleteSeasonFolder($series, $series->getSeasonNum());
+        $this->s3Client->deleteSeriesFolder($series);
     }
 }
