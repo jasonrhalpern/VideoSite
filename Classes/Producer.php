@@ -69,6 +69,7 @@ class Producer extends User{
 
     public function submitPilot()
     {
+        //this will need to insert a season and add episode
     }
 
     public function editSeriesTitle()

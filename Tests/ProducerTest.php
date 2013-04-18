@@ -83,24 +83,58 @@ class ProducerTest extends PHPUnit_Framework_TestCase{
     }
 
     public function testAddEpisodeToSeries(){
+
         $this->assertTrue($this->producer->createSeries($this->series));
         $series = Series::loadSeriesByTitle('Figaro Saves The World Part Deux');
 
         $video = new Video('Hicks vss Gangstas booyah', 'battlezz of tha century', 1);
-        $episode = new Episode($video, $series->getId(), $series->getSeasonNum(),
+        $episodeOne = new Episode($video, $series->getId(), $series->getSeasonNum(),
                                 ($series->getNumEpisodesInSeason($series->getSeasonNum()) + 1));
 
         $this->producer->addEpisodeToSeries($series, $video, '/var/www/Tests/TestFiles/test.mov');
-        $this->assertTrue($this->dbConnection->deleteEpisode($episode));
-        $this->assertTrue($this->dbConnection->deleteSeries($this->series));
-        $this->assertTrue($this->s3Client->deleteSeasonFolder($this->series, 1));
-        $this->assertTrue($this->s3Client->deleteSeriesFolder($this->series));
 
         $this->assertTrue($this->s3Client->waitUntilFileExists($this->s3Client->getSeasonFolderPath($series, 1) , '1_HD.mp4'));
         $this->assertTrue($this->s3Client->waitUntilFileExists($this->s3Client->getSeasonFolderPath($series, 1) , '1_SD.mp4'));
 
-        $this->s3Client->deleteEpisode($series, $series->getSeasonNum(), 1);
-        $this->s3Client->deleteSeasonFolder($series, $series->getSeasonNum());
+        $this->assertEquals($series->getNumEpisodesInSeason(1), 1);
+
+        $videoTwo = new Video('Hicks vss Gangstas booyah', 'battlezz of tha century', 1);
+        $episodeTwo = new Episode($videoTwo, $series->getId(), $series->getSeasonNum(),
+            ($series->getNumEpisodesInSeason($series->getSeasonNum()) + 1));
+
+        $this->producer->addEpisodeToSeries($series, $videoTwo, '/var/www/Tests/TestFiles/test.mov');
+
+        $this->assertTrue($this->s3Client->waitUntilFileExists($this->s3Client->getSeasonFolderPath($series, 1) , '2_HD.mp4'));
+        $this->assertTrue($this->s3Client->waitUntilFileExists($this->s3Client->getSeasonFolderPath($series, 1) , '2_SD.mp4'));
+
+        $this->assertEquals($series->getNumEpisodesInSeason(1), 2);
+        $this->producer->createNewSeason($series, 'The return of Figaro');
+        $this->assertEquals($series->getSeasonNum(), 2);
+
+        $videoThree = new Video('Hicks vss Gangstas booyah', 'battlezz of tha century', 1);
+        $episodeThree = new Episode($videoThree, $series->getId(), $series->getSeasonNum(),
+            ($series->getNumEpisodesInSeason($series->getSeasonNum()) + 1));
+
+        $this->producer->addEpisodeToSeries($series, $videoThree, '/var/www/Tests/TestFiles/test.mov');
+        $this->assertTrue($this->s3Client->waitUntilFileExists($this->s3Client->getSeasonFolderPath($series, 2) , '1_HD.mp4'));
+        $this->assertTrue($this->s3Client->waitUntilFileExists($this->s3Client->getSeasonFolderPath($series, 2) , '1_SD.mp4'));
+
+        $this->assertEquals($series->getNumEpisodesInSeason(2), 1);
+
+        $this->assertTrue($this->dbConnection->deleteEpisode($episodeOne));
+        $this->assertTrue($this->dbConnection->deleteEpisode($episodeTwo));
+        $this->assertTrue($this->dbConnection->deleteEpisode($episodeThree));
+
+        $this->s3Client->deleteEpisode($series, 1, 1);
+        $this->s3Client->deleteEpisode($series, 1, 2);
+        $this->s3Client->deleteEpisode($series, 2, 1);
+
+        $this->s3Client->deleteSeasonFolder($series, 1);
+        $this->s3Client->deleteSeasonFolder($series, 2);
+
+        $this->assertTrue($this->dbConnection->deleteSeason($series->getId(), 1));
+        $this->assertTrue($this->dbConnection->deleteSeason($series->getId(), 2));
+        $this->assertTrue($this->dbConnection->deleteSeries($this->series));
         $this->s3Client->deleteSeriesFolder($series);
     }
 }
