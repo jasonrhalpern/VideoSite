@@ -69,6 +69,7 @@ class S3 implements FileStorage{
      * Check if a folder exists in S3
      *
      * @param string $folderName Check if this folder exists
+     * @return bool True if the folder exists, false otherwise
      */
     public function folderExists($folderName){
 
@@ -117,7 +118,7 @@ class S3 implements FileStorage{
     /**
      * Create a new folder to hold the video files for the new season
      *
-     * @param string $series The series we are creating a new season for
+     * @param Series $series The series we are creating a new season for
      * @return bool True if a folder for was created, False otherwise
      */
     public function createSeasonFolder($series){
@@ -137,7 +138,7 @@ class S3 implements FileStorage{
     /**
      * Delete the folder that holds the video files for this season
      *
-     * @param string $series The series we are deleting a season for
+     * @param Series $series The series we are deleting a season for
      * @param string $seasonNumber The specific season folder to delete
      * @return bool True if a folder for was deleted, False otherwise
      */
