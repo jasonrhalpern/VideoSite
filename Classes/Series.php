@@ -172,6 +172,7 @@ class Series extends Production
      *
      * @param Video $videoObject The video object representing the video for this episode
      * @param string $fileName The file we are uploading to our file storage.
+     * @return bool True if the episode has been added, False otherwise
      */
     public function addEpisode($videoObject, $fileName){
 
@@ -201,6 +202,8 @@ class Series extends Production
         $this->transcoder->transcodeVideo($originalFile, $highDefinitionFile,
                                             $this->fileStorage->getThumbnailFolder($this, $this->getSeasonNum(),
                                                 $episodeNumber), '1351620000000-000010');
+
+        return true;
     }
 
     /**

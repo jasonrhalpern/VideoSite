@@ -35,41 +35,82 @@ abstract class Person
     /**
      * @return string The name of the person
      */
-    public function getName()
-    {
+    public function getName(){
         return $this->name;
+    }
+
+    /**
+     * Set the name
+     *
+     * @param string $name The name of the person
+     */
+    public function setName($name){
+        $this->name = $name;
     }
 
     /**
      * @return string The email of the person
      */
-    public function getEmail()
-    {
+    public function getEmail(){
         return $this->email;
+    }
+
+    /**
+     * Set the email
+     *
+     * @param string $newEmail The email of the person
+     */
+    public function setEmail($newEmail){
+        $this->email = $newEmail;
     }
 
     /**
      * @return int The unique id of the person
      */
-    public function getId()
-    {
+    public function getId(){
         return $this->id;
     }
 
     /**
+     * Set the id
+     *
+     * @param int $newId The id of the person
+     */
+    public function setId($newId){
+        $this->id = $newId;
+    }
+
+
+    /**
      * @return string The username of the person
      */
-    public function getUsername()
-    {
+    public function getUsername(){
         return $this->username;
+    }
+
+    /**
+     * Set the username
+     *
+     * @param string $newUsername The username of the person
+     */
+    public function setUsername($newUsername){
+        $this->username = $newUsername;
     }
 
     /**
      * @return string The password of the person
      */
-    public function getPassword()
-    {
+    public function getPassword(){
         return $this->password;
+    }
+
+    /**
+     * Set the password
+     *
+     * @param string $newPassword The password of the person
+     */
+    public function setPassword($newPassword){
+        $this->password = $newPassword;
     }
 
     /**
@@ -88,55 +129,6 @@ abstract class Person
         $encrypted_password = md5($salt.$password);
 
         return $encrypted_password;
-    }
-
-    /**
-     * Set the email
-     *
-     * @param string $newEmail The email of the person
-     */
-    public function setEmail($newEmail)
-    {
-        $this->email = $newEmail;
-    }
-
-    /**
-     * Set the id
-     *
-     * @param int $newId The id of the person
-     */
-    public function setId($newId)
-    {
-        $this->id = $newId;
-    }
-
-    /**
-     * Set the username
-     *
-     * @param string $newUsername The username of the person
-     */
-    public function setUsername($newUsername)
-    {
-        $this->username = $newUsername;
-    }
-
-    /**
-     * Set the name
-     *
-     * @param string $name The name of the person
-     */
-    public function setName($name){
-        $this->name = $name;
-    }
-
-    /**
-     * Set the password
-     *
-     * @param string $newPassword The password of the person
-     */
-    public function setPassword($newPassword)
-    {
-        $this->password = $newPassword;
     }
 }
 

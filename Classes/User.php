@@ -48,6 +48,15 @@ class User extends Person{
         if(!$this->hasValidEmail())
             return false;
 
+        if(!$this->hasValidPassword())
+            return false;
+
+        if(!$this->hasValidUsername())
+            return false;
+
+        if(!$this->hasOnlyAlphanumericCharacters())
+            return false;
+
         return $this->db->insertUser($this);
 
     }
@@ -135,6 +144,36 @@ class User extends Person{
         return preg_match("!^$addr_spec$!", $this->getEmail()) ? true : false;
     }
 
+    /**
+     * Check to see if this password is a valid length
+     *
+     * @return bool True if the password is a valid length, false otherwise
+     */
+    public function hasValidPassword(){
+        return (strlen($this->getPassword()) > 4);
+    }
+
+    /**
+     * Check to see if the username is a valid length
+     *
+     * @return bool True if the username is a valid length, false otherwise
+     */
+    public function hasValidUsername(){
+        return ((strlen($this->getUsername()) > 3) && (strlen($this->getUsername()) < 21));
+    }
+
+    /**
+     * Check to make sure the username is only alphanumeric characters
+     * (underscores and whitespace are also allowed)
+     *
+     * @return bool True if the username is only alphanumeric characters, false otherwise
+     */
+    public function hasOnlyAlphanumericCharacters(){
+        return preg_match('/^[a-zA-Z0-9_ ]+$/', $this->getUsername()) ? true : false;
+    }
+
+
+
     public function getJoined(){
 
         return $this->joined;
@@ -198,7 +237,7 @@ class User extends Person{
     /**
      * Generate a new password for this user and reset it
      *
-     * @return string The new password
+     * @return bool|string The new password or false if it couldn't be changed
      */
     public function resetPassword(){
 
@@ -206,6 +245,8 @@ class User extends Person{
 
         if($this->changePassword($newPassword))
             return $this->getPassword();
+
+        return false;
     }
 
     public function suggestCompetition()

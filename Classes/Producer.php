@@ -27,6 +27,7 @@ class Producer extends User{
      * Create a new season for this series
      *
      * @param Series $series The series for which we are creating a new season
+     * @param string $seasonDescription The description for this season
      * @return bool True if a new season has been created, False otherwise
      */
     public function createNewSeason($series, $seasonDescription){
@@ -38,19 +39,24 @@ class Producer extends User{
      * Create a new series
      *
      * @param Series $series The details of the new series that is being created
+     * @param string $seasonOneDescription The description of the first season of the series
      * @return bool True if the series has been created, False otherwise
      */
-    public function createSeries($series){
+    public function createSeries($series, $seasonOneDescription){
 
         /*
-         * insert series into our database and create a folder for the series episodes
+         * insert series and season into our database and create a folder for the series episodes
          * and create a folder for season 1 episodes
          */
         if($this->db->insertSeries($series)){
             if($this->fileStorage->createSeriesFolder($series))
-                if($this->fileStorage->createSeasonFolder($series))
-                    //upload pilot episode??
-                    return true;
+                if($this->fileStorage->createSeasonFolder($series)){
+                    $tempSeries = Series::loadSeriesByTitle($series->getTitle());
+                    if($this->db->insertSeason($tempSeries->getId(), 1, $seasonOneDescription)){
+                        //upload pilot episode??
+                        return true;
+                    }
+                }
         }
 
         return false;
@@ -67,17 +73,15 @@ class Producer extends User{
 
     }
 
-    public function submitPilot()
-    {
-        //this will need to insert a season and add episode
+    public function submitPilot(){
+        //this will need to insert a series, a season and add episode
+        //or should create series insert the season??
     }
 
-    public function editSeriesTitle()
-    {
+    public function editSeriesTitle(){
     }
 
-    public function editSeriesDirector()
-    {
+    public function editSeriesDirector(){
     }
 
     /**
@@ -95,16 +99,13 @@ class Producer extends User{
         return $this->db->isExecuted($query);
     }
 
-    public function editSeriesWriters()
-    {
+    public function editSeriesWriters(){
     }
 
-    public function editSeriesActors()
-    {
+    public function editSeriesActors(){
     }
 
-    public function editSeriesProducers()
-    {
+    public function editSeriesProducers(){
     }
 
 }

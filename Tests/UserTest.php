@@ -50,6 +50,44 @@ class UserTest extends PHPUnit_Framework_TestCase{
         $this->dbConnection->deleteUser($this->userOne);
     }
 
+    public function testHasValidPassword(){
+        $one = new User('Donope Gangsta', 'tornaldz30t@aol.com', 'GMoney6612', 1, 'tanya');
+        $two = new User('Donope Gangsta', 'tornaldz30t@aol.com', 'GMoney6612', 1, 'tanyaaaaaaaa');
+        $three = new User('Donope Gangsta', 'tornaldz30t@aol.com', 'GMoney6612', 1, 'tany');
+
+        $this->assertTrue($one->hasValidPassword());
+        $this->assertTrue($two->hasValidPassword());
+        $this->assertFalse($three->hasValidPassword());
+    }
+
+    public function testHasValidUsername(){
+        $one = new User('Donope Gangsta', 'tornaldz30t@aol.com', 'GMoney6612', 1, 'tanya');
+        $two = new User('Donope Gangsta', 'tornaldz30t@aol.com', 'GM6', 1, 'tanya');
+        $three = new User('Donope Gangsta', 'tornaldz30t@aol.com', 'GMoney661222222222222222222222222', 1, 'tanya');
+
+        $this->assertTrue($one->hasValidUsername());
+        $this->assertFalse($two->hasValidUsername());
+        $this->assertFalse($three->hasValidUsername());
+    }
+
+    public function testHasOnlyAlphanumericCharacters(){
+        $one = new User('Donope Gangsta', 'tornaldz30t@aol.com', 'GMoney6612', 1, 'tanya');
+        $two = new User('Donope Gangsta', 'tornaldz30t@aol.com', 'G Money_6612', 1, 'tanya');
+        $three = new User('Donope Gangsta', 'tornaldz30t@aol.com', 'GMoney $6612', 1, 'tanya');
+        $four = new User('Donope Gangsta', 'tornaldz30t@aol.com', 'GMoney6612$', 1, 'tanya');
+        $five = new User('Donope Gangsta', 'tornaldz30t@aol.com', 'GMone#y 6612', 1, 'tanya');
+        $six = new User('Donope Gangsta', 'tornaldz30t@aol.com', 'GMoney6;612$', 1, 'tanya');
+        $seven = new User('Donope Gangsta', 'tornaldz30t@aol.com', '<>', 1, 'tanya');
+
+        $this->assertTrue($one->hasOnlyAlphanumericCharacters());
+        $this->assertTrue($two->hasOnlyAlphanumericCharacters());
+        $this->assertFalse($three->hasOnlyAlphanumericCharacters());
+        $this->assertFalse($four->hasOnlyAlphanumericCharacters());
+        $this->assertFalse($five->hasOnlyAlphanumericCharacters());
+        $this->assertFalse($six->hasOnlyAlphanumericCharacters());
+        $this->assertFalse($seven->hasOnlyAlphanumericCharacters());
+    }
+
     public function testHasDuplicateUsername(){
         $this->assertTrue($this->dbConnection->insertUser($this->userOne));
         $this->assertFalse($this->userTwo->hasDuplicateUsername());

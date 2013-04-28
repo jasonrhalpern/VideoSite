@@ -29,14 +29,12 @@ abstract class Production{
         $this->transcoder = new Transcoder();
     }
 
-    public function addVideo()
-    {
+    public function addVideo(){
         //connect to S3, add video to S3
         //connect to DB, add details to DB
     }
 
-    public function deleteVideo()
-    {
+    public function deleteVideo(){
         //connect to S3, remove video to S3
         //connect to DB, remove details to DB
     }
@@ -44,8 +42,7 @@ abstract class Production{
     /**
      * @return string The description for the series
      */
-    public function getDescription()
-    {
+    public function getDescription(){
         return $this->description;
     }
 
@@ -54,16 +51,14 @@ abstract class Production{
      *
      * @param string $newDescr The description of the series
      */
-    public function setDescription($newDescr)
-    {
+    public function setDescription($newDescr){
         $this->description = $newDescr;
     }
 
     /**
      * @return string The title of the series
      */
-    public function getTitle()
-    {
+    public function getTitle(){
         return $this->title;
     }
 
@@ -72,16 +67,14 @@ abstract class Production{
      *
      * @param string $newTitle The title of the series
      */
-    public function setTitle($newTitle)
-    {
+    public function setTitle($newTitle){
         $this->title = $newTitle;
     }
 
     /**
      * @return int The id of the series
      */
-    public function getId()
-    {
+    public function getId(){
         return $this->id;
     }
 
@@ -105,8 +98,7 @@ abstract class Production{
     /**
      * @return array The tags for the series
      */
-    public function getTags()
-    {
+    public function getTags(){
         return $this->tags;
     }
 
@@ -115,8 +107,7 @@ abstract class Production{
      *
      * @param array $newTags The tags for the series
      */
-    public function setTags($newTags)
-    {
+    public function setTags($newTags){
         $this->tags = $newTags;
     }
 
@@ -124,8 +115,7 @@ abstract class Production{
     {
     }
 
-    public function removeTag()
-    {
+    public function removeTag(){
     }
 
     /**

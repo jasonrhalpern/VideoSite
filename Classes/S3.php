@@ -359,7 +359,8 @@ class S3 implements FileStorage{
     }
 
     /**
-     * Get the episode key for the original video file. This is the full path to that file.
+     * Get the episode key for the original video file. This is not the full path since it
+     * doesn't include the S3 root.
      *
      * @param Series $series
      * @param int $seasonNum The season number
@@ -371,7 +372,8 @@ class S3 implements FileStorage{
     }
 
     /**
-     * Get the episode key for the standard definition video file. This is the full path to that file.
+     * Get the episode key for the standard definition video file. This is not the full path since it
+     * doesn't include the S3 root.
      *
      * @param Series $series The series
      * @param int $seasonNum The season number
@@ -383,7 +385,8 @@ class S3 implements FileStorage{
     }
 
     /**
-     * Get the episode key for the high definition video file. This is the full path to that file.
+     * Get the episode key for the high definition video file. This is not the full path since it
+     * doesn't include the S3 root.
      *
      * @param Series $series The series
      * @param int $seasonNum The season number
@@ -395,7 +398,8 @@ class S3 implements FileStorage{
     }
 
     /**
-     * Get the thumbnail folder for a specific episode. This is the full path to that folder.
+     * Get the thumbnail folder for a specific episode. This is not the full path to the folder
+     * since it doesn't include the S3 root.
      *
      * @param Series $series The series
      * @param int $seasonNum The season number

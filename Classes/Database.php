@@ -34,6 +34,7 @@ interface Database
 
     public function insertSeason($seriesId, $seasonNum, $description);
     public function deleteSeason($seriesId, $seasonNum);
+    public function seasonExists($seriesId, $seasonNum);
 
     public function insertSeries($series);
     public function deleteSeries($series);

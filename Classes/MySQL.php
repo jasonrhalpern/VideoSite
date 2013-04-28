@@ -57,6 +57,49 @@ class MySQL implements Database{
         $this->dbh->close();
     }
 
+    /**
+     * Check if our database query returned any results
+     *
+     * @param mysqli $query The query we are executing
+     * @return bool True if results have been found, False otherwise
+     */
+    public function dataExists($query){
+        $query->execute();
+        $query->store_result();
+        $dataExists = $query->num_rows;
+        $query->close();
+
+        /* check if this data already exists in the database */
+        if($dataExists > 0){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    /**
+     * Check if the query was successfully executed
+     *
+     * @param mysqli $query The query that is being executed
+     * @return bool True if the query was executed, False otherwise
+     */
+    public function isExecuted($query){
+
+        $query->execute();
+        $query->store_result();
+        $querySuccess = $query->affected_rows;
+        $query->close();
+
+        /* check if successful */
+        if($querySuccess !== -1){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
 
     /**
      * Add the user to the database
@@ -277,7 +320,7 @@ class MySQL implements Database{
      * @param $userId
      * @return int|bool The video ID if the video exists, false otherwise
      */
-    public function mostRecentVideoId($userId){
+    private function mostRecentVideoId($userId){
 
         $query = $this->dbh->prepare("select * from video where created_by = ? order by video_id DESC LIMIT 1");
         $query->bind_param("i", $userId);
@@ -356,48 +399,18 @@ class MySQL implements Database{
     }
 
     /**
-     * Check if our database query returned any results
+     * Check if a specific season exists for a given series
      *
-     * @param mysqli $query The query we are executing
-     * @return bool True if results have been found, False otherwise
+     * @param int $seriesId The id of the series
+     * @param int $seasonNum The season number
+     * @return bool True if the season exists for this series, false otherwise
      */
-    public function dataExists($query){
-        $query->execute();
-        $query->store_result();
-        $dataExists = $query->num_rows;
-        $query->close();
+    public function seasonExists($seriesId, $seasonNum){
+        $query = $this->dbh->prepare("select * from season where series_id = ? and season_num = ?");
+        $query->bind_param("ii", $seriesId, $seasonNum);
 
-        /* check if this data already exists in the database */
-        if($dataExists > 0){
-            return true;
-        }
-        else{
-            return false;
-        }
+        return $this->dataExists($query);
     }
-
-    /**
-     * Check if the query was successfully executed
-     *
-     * @param mysqli $query The query that is being executed
-     * @return bool True if the query was executed, False otherwise
-     */
-    public function isExecuted($query){
-
-        $query->execute();
-        $query->store_result();
-        $querySuccess = $query->affected_rows;
-        $query->close();
-
-        /* check if successful */
-        if($querySuccess !== -1){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-
 
 }
 

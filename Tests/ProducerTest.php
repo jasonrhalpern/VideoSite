@@ -37,16 +37,19 @@ class ProducerTest extends PHPUnit_Framework_TestCase{
     }
 
     public function testCreateSeries(){
-        $this->assertTrue($this->producer->createSeries($this->series));
-        $this->assertFalse($this->producer->createSeries($this->series));
+        $this->assertTrue($this->producer->createSeries($this->series, 'best season ever'));
+        $this->assertFalse($this->producer->createSeries($this->series, 'second best season ever'));
+        $series = Series::loadSeriesByTitle($this->series->getTitle());
 
+        $this->assertTrue($this->dbConnection->deleteSeason($series->getId(), 1));
         $this->assertTrue($this->dbConnection->deleteSeries($this->series));
         $this->assertTrue($this->s3Client->deleteSeasonFolder($this->series, 1));
         $this->assertTrue($this->s3Client->deleteSeriesFolder($this->series));
+
     }
 
     public function testCreateNewSeason(){
-        $this->assertTrue($this->producer->createSeries($this->series));
+        $this->assertTrue($this->producer->createSeries($this->series, 'this season will rock'));
 
         $series = Series::loadSeriesByTitle('Figaro Saves The World Part Deux');
 
@@ -59,6 +62,10 @@ class ProducerTest extends PHPUnit_Framework_TestCase{
         $this->assertEquals(3, $series->getSeasonNum());
 
         $this->assertTrue($this->dbConnection->deleteSeries($this->series));
+        $this->assertTrue($this->dbConnection->seasonExists($series->getId(), 1));
+        $this->assertTrue($this->dbConnection->seasonExists($series->getId(), 2));
+        $this->assertTrue($this->dbConnection->seasonExists($series->getId(), 3));
+        $this->assertTrue($this->dbConnection->deleteSeason($series->getId(), 1));
         $this->assertTrue($this->dbConnection->deleteSeason($series->getId(), 2));
         $this->assertTrue($this->dbConnection->deleteSeason($series->getId(), 3));
         $this->assertTrue($this->s3Client->deleteSeasonFolder($series, 1));
@@ -68,7 +75,7 @@ class ProducerTest extends PHPUnit_Framework_TestCase{
     }
 
     public function testEditSeriesDescr(){
-        $this->assertTrue($this->producer->createSeries($this->series));
+        $this->assertTrue($this->producer->createSeries($this->series, 'great season brah'));
 
         $series = Series::loadSeriesByTitle('Figaro Saves The World Part Deux');
         $this->assertEquals($series->getDescription(),'Figaros Heroic Effort To Save The World');
@@ -80,11 +87,13 @@ class ProducerTest extends PHPUnit_Framework_TestCase{
         $this->assertTrue($this->dbConnection->deleteSeries($this->series));
         $this->assertTrue($this->s3Client->deleteSeasonFolder($this->series, 1));
         $this->assertTrue($this->s3Client->deleteSeriesFolder($this->series));
+        $this->assertTrue($this->dbConnection->deleteSeason($series->getId(), 1));
+
     }
 
     public function testAddEpisodeToSeries(){
 
-        $this->assertTrue($this->producer->createSeries($this->series));
+        $this->assertTrue($this->producer->createSeries($this->series, 'awesome season brah'));
         $series = Series::loadSeriesByTitle('Figaro Saves The World Part Deux');
 
         $video = new Video('Hicks vss Gangstas booyah', 'battlezz of tha century', 1);
