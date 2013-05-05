@@ -9,24 +9,32 @@ require_once dirname(__FILE__) . '/../Classes/User.php';
 require_once dirname(__FILE__) . '/../Classes/Series.php';
 require_once dirname(__FILE__) . '/../Classes/Video.php';
 require_once dirname(__FILE__) . '/../Classes/Episode.php';
+require_once dirname(__FILE__) . '/../Classes/Competition.php';
 
 class MySQLTest extends PHPUnit_Framework_TestCase{
     protected $user;
     protected $series;
+    protected $competition;
     protected $dbConnection;
 
     public function setUp(){
         $this->user = new User('Jason HollaBack', 'jasonrhalpern@gmail.com', 'JzPern67', 1, 'sailor');
         $this->series = new Series(1, 'The Crazies Are Out', 'An in depth look into an insane asylum',
                                         'Documentary', 1);
+        $this->competition = new Competition("acting like deniro", "do your best deniro impression",
+                                            DateHelper::datePlusDays(DateHelper::currentDate(), 2),
+                                            DateHelper::datePlusDays(DateHelper::currentDate(), 7),
+                                            2.99, 'Individual', 'Acting');
         $this->dbConnection = new MySQL();
     }
 
     public function tearDown(){
         $this->dbConnection->deleteUser($this->user);
+
         $this->dbConnection->deleteSeries($this->series);
 
         unset($this->user);
+        unset($this->competition);
         unset($this->series);
         unset($this->dbConnection);
     }
@@ -77,6 +85,20 @@ class MySQLTest extends PHPUnit_Framework_TestCase{
         $this->assertFalse($this->dbConnection->insertSeason(1, 1, 'Thiiss season rules'));
         $this->assertTrue($this->dbConnection->deleteSeason(1, 1));
 
+    }
+
+    public function testInsertCompetition(){
+        $this->assertTrue($this->dbConnection->insertCompetition($this->competition));
+        $id = $this->dbConnection->mostRecentCompetitionId();
+        $this->dbConnection->deleteCompetition($id);
+    }
+
+    public function testInsertCompetitionEntry(){
+        $this->assertTrue($this->dbConnection->insertCompetitionEntry(1, 1));
+    }
+
+    public function testDeleteCompetitionEntry(){
+        $this->assertTrue($this->dbConnection->deleteCompetitionEntry(1, 1));
     }
 
 }

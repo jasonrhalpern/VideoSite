@@ -157,6 +157,38 @@ class S3 implements FileStorage{
     }
 
     /**
+     * Create a new folder to hold the files for this competition
+     *
+     * @param Competition $competition The competition we are creating a folder for
+     */
+    public function createCompetitionFolder($competition){
+
+        $bucketName = $this->getFullCompetitionPath($competition);
+
+        /* create a bucket in s3 for this competition */
+        $this->createFolder($bucketName);
+
+        /* bucket should have been created at this point */
+        return $this->folderExists($bucketName);
+    }
+
+    /**
+     * Delete the folder for this competition
+     *
+     * @param Competition $competition The competition we are deleting the folder for
+     */
+    public function deleteCompetitionFolder($competition){
+
+        $bucketName = $this->getFullCompetitionPath($competition);
+
+        /* delete the bucket in s3 for this competition */
+        $this->deleteFolder($bucketName);
+
+        /* bucket should have been deleted at this point */
+        return !$this->folderExists($bucketName);
+    }
+
+    /**
      * Check to see if a bucket exists for a particular series
      *
      * @param Series $series The series we are looking up
@@ -342,6 +374,16 @@ class S3 implements FileStorage{
      */
     public function getFullSeriesPath($series){
         return AppConfig::getS3Root() . $this->getSeriesFolderName($series) . '/';
+    }
+
+    /**
+     * This is the full path to a bucket of a competition.
+     *
+     * @param Competition $competition The competition
+     * @return string The full path to the bucket for the competition
+     */
+    public function getFullCompetitionPath($competition){
+        return AppConfig::getS3Root() . 'Competitions/' . $competition->getId();
     }
 
     /**

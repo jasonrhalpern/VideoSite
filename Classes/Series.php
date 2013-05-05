@@ -11,8 +11,8 @@
 require_once('Production.php');
 require_once('DateHelper.php');
 
-class Series extends Production
-{
+class Series extends Production{
+
     protected $createdDate; //date
     protected $creatorId; //id of user that created the series
     protected $category; //comedy, drama, etc.

@@ -36,6 +36,20 @@ class DateHelper{
 
         return $dateTime;
     }
+
+    /**
+     * Generate the date that is a certain number of days past the original date.
+     *
+     * @param Date $originalDate
+     * @param int $numberOfDays The number of days from the original date
+     */
+    public static function datePlusDays($originalDate, $numberOfDays){
+
+        $date = strtotime($originalDate);
+        $date = strtotime("+".$numberOfDays." day", $date);
+
+        return date("Y-m-d", $date);
+    }
 }
 
 ?>

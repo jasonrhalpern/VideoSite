@@ -320,7 +320,7 @@ class MySQL implements Database{
      * @param $userId
      * @return int|bool The video ID if the video exists, false otherwise
      */
-    private function mostRecentVideoId($userId){
+    public function mostRecentVideoId($userId){
 
         $query = $this->dbh->prepare("select * from video where created_by = ? order by video_id DESC LIMIT 1");
         $query->bind_param("i", $userId);
@@ -412,6 +412,106 @@ class MySQL implements Database{
         return $this->dataExists($query);
     }
 
+    /**
+     * Insert a new competition into the database
+     *
+     * @param Competition $competition The competition we want to add to the database
+     * @return bool True if the competition has been added, false otherwise
+     */
+    public function insertCompetition($competition){
+        $temp_id = 0;
+
+        $query = $this->dbh->prepare("insert into competition values(?, ?, ?, ?, ?, ?, ?, ?)");
+        $query->bind_param("issssdss", $temp_id, $competition->getTitle(), $competition->getDescription(),
+            $competition->getStartDate(), $competition->getEndDate(), $competition->getEntryFee(),
+            $competition->getType(), $competition->getCategory());
+
+        return $this->isExecuted($query);
+    }
+
+    /**
+     * Delete a competition from the database
+     *
+     * @param int $competitionId The ID of the competition we want to delete
+     * @return bool True if the competition has been deleted, false otherwise
+     */
+    public function deleteCompetition($competitionId){
+        $query = $this->dbh->prepare("delete from competition where id = ?");
+        $query->bind_param("i", $competitionId);
+
+        return $this->isExecuted($query);
+    }
+
+    /**
+     * Execute a query about a Competition and then load all the details of the competition that
+     * match the query
+     *
+     * @param Competition $competition The competition whose details we are loading
+     * @param mysqli $query The query we are executing
+     */
+    public static function getCompetitionInfo($competition, $query){
+        $query->execute();
+        $query->bind_result($id, $title, $description, $startDate,
+                            $endDate, $entryFee, $type, $category);
+        if($query->fetch()){
+            $competition->setId($id);
+            $competition->setTitle($title);
+            $competition->setDescription($description);
+            $competition->setStartDate($startDate);
+            $competition->setEndDate($endDate);
+            $competition->setEntryFee($entryFee);
+            $competition->setType($type);
+            $competition->setCategory($category);
+        }
+
+    }
+
+    /**
+     * WARNING: DON'T use this, only for testing purposes.
+     * This gets the competition ID of the last competition that was added to the database.
+     *
+     * @return int|bool The competition ID if the competition exists, false otherwise
+     */
+    public function mostRecentCompetitionId(){
+
+        $query = $this->dbh->prepare("select * from competition order by id DESC LIMIT 1");
+        $query->execute();
+        $query->bind_result($id, $title, $description, $startDate, $endDate, $fee, $type, $category);
+        if($query->fetch())
+            return $id;
+        else
+            return false;
+    }
+
+    /**
+     * Add a new entry to the competition
+     *
+     * @param int $competitionId The competition we are adding an entry to
+     * @param int $videoId The video we are adding to the competition
+     * @return bool True if the entry has been added, False otherwise
+     */
+    public function insertCompetitionEntry($competitionId, $videoId){
+
+        $query = $this->dbh->prepare("insert into competition_entries values(?, ?)");
+        $query->bind_param("ii", $competitionId, $videoId);
+
+        return $this->isExecuted($query);
+    }
+
+    /**
+     * Delete a new entry from the competition
+     *
+     * @param int $competitionId The competition we are deleting an entry from
+     * @param int $videoId The video we are unregistering from the competition
+     * @return bool True if the entry has been added, False otherwise
+     */
+    public function deleteCompetitionEntry($competitionId, $videoId){
+
+        $query = $this->dbh->prepare("delete from competition_entries where competition_id = ? and video_id = ?");
+        $query->bind_param("ii", $competitionId, $videoId);
+
+        return $this->isExecuted($query);
+    }
 }
 
 ?>

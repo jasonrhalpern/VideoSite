@@ -35,6 +35,10 @@ class Admin extends Person
     {
     }
 
+    public function createCompetition(){
+
+    }
+
     public function startCompetition()
     {
     }

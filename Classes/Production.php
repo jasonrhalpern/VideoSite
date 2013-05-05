@@ -8,6 +8,7 @@
  */
 
 require_once dirname(__FILE__) . '/../Classes/MySQL.php';
+require_once dirname(__FILE__) . '/../Classes/S3.php';
 require_once dirname(__FILE__) . '/../Classes/Transcoder.php';
 
 abstract class Production{
