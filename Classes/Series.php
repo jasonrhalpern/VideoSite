@@ -153,13 +153,8 @@ class Series extends Production{
         $query = $this->getDBConnection()->prepare("select COUNT(*) from episode where
                                                     series_id = ? and season_num = ?");
         $query->bind_param("ii", $this->getId(), $seasonNumber);
-        $query->execute();
-        $query->bind_result($numberOfEpisodes);
-        if($query->fetch()){
-            return $numberOfEpisodes;
-        }
 
-        return false;
+        return $this->db->getNumberOfRows($query);
     }
 
     /**
@@ -195,13 +190,11 @@ class Series extends Production{
         /* create the standard definition (SD) video file */
         $standardDefinitionFile = $this->fileStorage->getSDEpisodeKey($this, $this->getSeasonNum(), $episodeNumber);
         $this->transcoder->transcodeVideo($originalFile, $standardDefinitionFile,
-                                            $this->fileStorage->getThumbnailFolder($this, $this->getSeasonNum(),
-                                                $episodeNumber), '1351620000000-000020');
+                                            $this->fileStorage->getThumbnailFolder($this, $this->getSeasonNum(), $episodeNumber), '1351620000000-000020');
         /* create the high definition (HD) video file */
         $highDefinitionFile = $this->fileStorage->getHDEpisodeKey($this, $this->getSeasonNum(), $episodeNumber);
         $this->transcoder->transcodeVideo($originalFile, $highDefinitionFile,
-                                            $this->fileStorage->getThumbnailFolder($this, $this->getSeasonNum(),
-                                                $episodeNumber), '1351620000000-000010');
+                                            $this->fileStorage->getThumbnailFolder($this, $this->getSeasonNum(), $episodeNumber), '1351620000000-000010');
 
         return true;
     }

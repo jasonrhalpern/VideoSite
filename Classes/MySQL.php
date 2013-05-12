@@ -369,6 +369,24 @@ class MySQL implements Database{
     }
 
     /**
+     * Returns the number of rows found from executing the query.
+     *
+     * @param mysqli $query The query we are executing, must use MySQL's COUNT() function.
+     * @return int|bool The number of rows, false if the query failed to execute
+     */
+    public function getNumberOfRows($query){
+
+        $query->execute();
+        $query->bind_result($count);
+        if($query->fetch()){
+            return $count;
+        }
+
+        return false;
+    }
+
+
+    /**
      * Insert a new season into the database
      *
      * @param int $seriesId The id of the series that we are adding a season to
@@ -509,6 +527,35 @@ class MySQL implements Database{
 
         $query = $this->dbh->prepare("delete from competition_entries where competition_id = ? and video_id = ?");
         $query->bind_param("ii", $competitionId, $videoId);
+
+        return $this->isExecuted($query);
+    }
+
+    /**
+     * Add a new comment to the database
+     *
+     * @param Comment $comment The comment we want to add to the database
+     * @return bool True if the comment has been added to the database, false otherwise
+     */
+    public function insertComment($comment){
+        $temp_id = 0;
+
+        $query = $this->dbh->prepare("insert into comments values(?, ?, ?, ?, ?)");
+        $query->bind_param("iisss", $temp_id, $comment->getProductionId(), $comment->getUsername(),
+                                    $comment->getText(), $comment->getPosted());
+
+        return $this->isExecuted($query);
+    }
+
+    /**
+     * Delete a comment from the database
+     *
+     * @param Comment $comment The comment we want to delete from the database
+     * @return bool True if the comment has been deleted from the database, false otherwise
+     */
+    public function deleteComment($comment){
+        $query = $this->dbh->prepare("delete from comments where comment_id = ?");
+        $query->bind_param("i", $comment->getCommentId());
 
         return $this->isExecuted($query);
     }

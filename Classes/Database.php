@@ -19,6 +19,9 @@ interface Database
     public function dataExists($query);
     public function isExecuted($query);
 
+    public function getNumberOfRows($query);
+    public function mostRecentCompetitionId();
+
     public function insertUser($user);
     public function deleteUser($user);
     public function userExists($user);
@@ -28,6 +31,7 @@ interface Database
 
     public function insertEpisode($episode);
     public function deleteEpisode($episode);
+    public function mostRecentVideoId($userId);
 
     public function insertSeason($seriesId, $seasonNum, $description);
     public function deleteSeason($seriesId, $seasonNum);
@@ -42,6 +46,9 @@ interface Database
 
     public function insertCompetitionEntry($competitionId, $videoId);
     public function deleteCompetitionEntry($competitionId, $videoId);
+
+    public function insertComment($comment);
+    public function deleteComment($comment);
 
 }
 

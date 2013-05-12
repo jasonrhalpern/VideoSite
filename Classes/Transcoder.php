@@ -1,4 +1,4 @@
-<?php
+e<?php
 /**
  * The transcoder converts videos between different formats and also generates thumbnails.
  *

@@ -45,8 +45,9 @@ class CompetitorTest extends PHPUnit_Framework_TestCase{
         $this->assertTrue($this->dbConnection->deleteCompetitionEntry($this->competition->getId(), $video->getVideoId()));
 
         $this->assertTrue($this->s3Client->waitUntilFileExists($this->s3Client->getFullCompetitionPath($this->competition), (string)$video->getVideoId()));
-        $this->s3Client->deleteVideo($this->s3Client->getFullCompetitionPath($this->competition), $video->getVideoId());
+        $this->assertTrue($this->s3Client->waitUntilFileExists($this->s3Client->getFullCompetitionPath($this->competition), (string)$video->getVideoId() . '_SD.mp4'));
 
+        $this->s3Client->deleteCompetitionEntry($this->competition, $video->getVideoId());
     }
 
 }

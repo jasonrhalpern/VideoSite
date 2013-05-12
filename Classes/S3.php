@@ -299,6 +299,21 @@ class S3 implements FileStorage{
     }
 
     /**
+     * Delete an entry from the competition. This deletes the original video file,
+     * the standard definition video file and the thumbnails for the video
+     *
+     * @param Competition $competition The competition
+     * @param int $videoId The ID of the entry we are deleting
+     */
+    public function deleteCompetitionEntry($competition, $videoId){
+        $this->deleteVideo($this->getFullCompetitionPath($competition), $videoId);
+        $this->deleteVideo($this->getFullCompetitionPath($competition), $videoId . '_SD.mp4');
+        $thumbnailFolder = substr($this->getCompetitionThumbnailFolder($competition, $videoId), 0, -1);
+        $this->deleteImage(AppConfig::getS3Root() . $thumbnailFolder, '00001.png');
+        $this->deleteImage(AppConfig::getS3Root() . $thumbnailFolder, '00002.png');
+    }
+
+    /**
      * Upload an image to the S3 service. The image will be on our server and
      * we will then need to add it to the appropriate bucket in S3. The name of
      * the image will change when we upload it to S3.
@@ -402,6 +417,31 @@ class S3 implements FileStorage{
     }
 
     /**
+     * Get the key for a video in the competition. This is not the full path since it doesn't
+     * include the S3 root.
+     *
+     * @param Competition $competition
+     * @param int $videoId The ID of the video that is an entry in the competition
+     * @return string The key to access the original file
+     */
+    public function getCompetitionKey($competition, $videoId){
+        return 'Competitions/' . $competition->getId() . '/' . $videoId;
+    }
+
+    /**
+     * Get the competition key for the standard definition video file. This is not the full path since it
+     * doesn't include the S3 root.
+     *
+     * @param Competition $competition
+     * @param int $videoId The ID of the video that is an entry in the competition
+     * @return string The key to access the SD video
+     */
+    public function getSDCompetitionKey($competition, $videoId){
+        return $this->getCompetitionKey($competition, $videoId) . '_SD.mp4';
+    }
+
+
+    /**
      * Get the episode key for the original video file. This is not the full path since it
      * doesn't include the S3 root.
      *
@@ -438,6 +478,17 @@ class S3 implements FileStorage{
      */
     public function getHDEpisodeKey($series, $seasonNum, $episodeNum){
         return $this->getEpisodeKey($series, $seasonNum, $episodeNum) . '_HD.mp4';
+    }
+
+    /**
+     * Get the thumbnail folder for a specific entry in a competition. This is not the full
+     * path to the folder since it doesn't include the S3 root.
+     *
+     * @param Competition $competition
+     * @param int $videoId
+     */
+    public function getCompetitionThumbnailFolder($competition, $videoId){
+        return $this->getCompetitionKey($competition, $videoId) . '_thumbnails/';
     }
 
     /**

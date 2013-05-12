@@ -10,11 +10,14 @@ require_once dirname(__FILE__) . '/../Classes/Series.php';
 require_once dirname(__FILE__) . '/../Classes/Video.php';
 require_once dirname(__FILE__) . '/../Classes/Episode.php';
 require_once dirname(__FILE__) . '/../Classes/Competition.php';
+require_once dirname(__FILE__) . '/../Classes/Comment.php';
+
 
 class MySQLTest extends PHPUnit_Framework_TestCase{
     protected $user;
     protected $series;
     protected $competition;
+    protected $comment;
     protected $dbConnection;
 
     public function setUp(){
@@ -25,6 +28,7 @@ class MySQLTest extends PHPUnit_Framework_TestCase{
                                             DateHelper::datePlusDays(DateHelper::currentDate(), 2),
                                             DateHelper::datePlusDays(DateHelper::currentDate(), 7),
                                             2.99, 'Individual', 'Acting');
+        $this->comment = new Comment(1, 'Daisies Egg', 'Comment text', DateHelper::currentDateAndTime());
         $this->dbConnection = new MySQL();
     }
 
@@ -99,6 +103,14 @@ class MySQLTest extends PHPUnit_Framework_TestCase{
 
     public function testDeleteCompetitionEntry(){
         $this->assertTrue($this->dbConnection->deleteCompetitionEntry(1, 1));
+    }
+
+    public function testInsertComment(){
+        $this->assertTrue($this->dbConnection->insertComment($this->comment));
+    }
+
+    public function testDeleteComment(){
+        //$this->assertTrue($this->dbConnection->insertComment($this->comment));
     }
 
 }

@@ -75,6 +75,13 @@ class Competition extends Production{
         $competitionFolder = $this->fileStorage->getFullCompetitionPath($this);
         $this->fileStorage->uploadVideo($fileName, (string)$videoId, $competitionFolder);
 
+        /* Transcode the file that we just uploaded */
+        $originalFile = $this->fileStorage->getCompetitionKey($this, $videoId);
+        /* create the standard definition (SD) video file */
+        $standardDefinitionFile = $this->fileStorage->getSDCompetitionKey($this, $videoId);
+        $this->transcoder->transcodeVideo($originalFile, $standardDefinitionFile,
+            $this->fileStorage->getCompetitionThumbnailFolder($this, $videoId), '1351620000000-000020');
+
         return true;
     }
 

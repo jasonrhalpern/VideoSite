@@ -8,6 +8,9 @@ require_once('User.php');
 
 class Competitor extends User{
 
+    /**
+     * @param User $user
+     */
     public function __construct($user){
 
         parent::__construct($user->getName(), $user->getEmail(), $user->getUsername(),
