@@ -10,6 +10,7 @@
 require_once('Person.php');
 require_once('DateHelper.php');
 require_once('HelperFunc.php');
+require_once('Competition.php');
 require_once('MySQL.php');
 
 class User extends Person{
@@ -249,6 +250,90 @@ class User extends Person{
         return false;
     }
 
+    /**
+     * Add a comment
+     *
+     * @param Comment $comment
+     * @return bool True if the comment was added, false otherwise
+     */
+    public function addComment($comment){
+        return $this->db->insertComment($comment);
+    }
+
+    /**
+     * Delete a comment
+     *
+     * @param int $commentId
+     * @return bool True if the comment was deleted, false otherwise
+     */
+    public function deleteComment($commentId){
+        return $this->db->deleteComment($commentId);
+    }
+
+    /**
+     * Add a vote to an entry in a competition
+     *
+     * @param int $competitionId The ID of the competition
+     * @param int $videoId The ID of the video representing the entry
+     * @return bool True if the vote was added, false otherwise
+     */
+    public function addVote($competitionId, $videoId){
+
+        if($this->getNumberOfVotesRemaining($competitionId) == 0)
+            return false;
+
+        if($this->hasVoted($videoId))
+            return false;
+
+        return $this->db->addVote($competitionId, $videoId, $this->getId());
+    }
+
+    /**
+     * Delete a vote from an entry in a competition
+     *
+     * @param int $competitionId The ID of the competition
+     * @param int $videoId The ID of the video representing the entry
+     * @return bool True if the vote was removed, false otherwise
+     */
+    public function deleteVote($competitionId, $videoId){
+        return $this->db->deleteVote($competitionId, $videoId, $this->getId());
+    }
+
+    /**
+     * Check if the user has already voted for this video
+     *
+     * @param int $videoId The ID of the video
+     * @return bool True if the user has already voted for the video, false otherwise
+     */
+    public function hasVoted($videoId){
+        $query = $this->getDBConnection()->prepare("select COUNT(*) from competition_votes where
+                                                    video_id = ? and user_id = ?");
+        $query->bind_param("ii", $videoId, $this->getId());
+
+        if($this->db->getNumberOfRows($query) == 1){
+            return true;
+        } else{
+            return false;
+        }
+    }
+
+    /**
+     * Check how many votes a user has left for a competition. A user only gets a specific
+     * number of votes per competition
+     *
+     * @param int $competitionId The ID of the competition
+     * @return int The number of votes the user has left for this competition
+     */
+    public function getNumberOfVotesRemaining($competitionId){
+        $query = $this->getDBConnection()->prepare("select COUNT(*) from competition_votes where
+                                                    competition_id = ? and user_id = ?");
+        $query->bind_param("ii", $competitionId, $this->getId());
+
+        $votesRemaining = Competition::getVotesPerCompetition() - $this->db->getNumberOfRows($query);
+
+        return $votesRemaining;
+    }
+
     public function suggestCompetition()
     {
     }
@@ -285,12 +370,6 @@ class User extends Person{
     {
     }
 
-    public function addComment()
-    {
-    } //series and video
-    public function deleteComment()
-    {
-    } //series and video
     public function subscribeToSeries()
     {
     }

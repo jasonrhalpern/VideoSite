@@ -550,15 +550,65 @@ class MySQL implements Database{
     /**
      * Delete a comment from the database
      *
-     * @param Comment $comment The comment we want to delete from the database
+     * @param int $commentId The ID of the comment we want to delete from the database
      * @return bool True if the comment has been deleted from the database, false otherwise
      */
-    public function deleteComment($comment){
+    public function deleteComment($commentId){
         $query = $this->dbh->prepare("delete from comments where comment_id = ?");
-        $query->bind_param("i", $comment->getCommentId());
+        $query->bind_param("i", $commentId);
 
         return $this->isExecuted($query);
     }
+
+    /**
+     * This gets the comment ID of the last comment that this user added.
+     *
+     * @param $username
+     * @return int|bool The comment ID if the comment exists, false otherwise
+     */
+    public function mostRecentCommentId($username){
+
+        $query = $this->dbh->prepare("select * from comments where username = ? order by comment_id DESC LIMIT 1");
+        $query->bind_param("s", $username);
+        $query->execute();
+        $query->bind_result($comment_id, $production_id, $user, $text, $posted);
+        if($query->fetch())
+            return $comment_id;
+        else
+            return false;
+    }
+
+    /**
+     * Add a vote to an entry in a competition
+     *
+     * @param int $competitionId The competition that the entry is in
+     * @param int $videoId The video that the vote is being added to
+     * @param int $userId The ID of the user casting the vote
+     */
+    public function addVote($competitionId, $videoId, $userId){
+
+        $query = $this->dbh->prepare("insert into competition_votes values(?, ?, ?)");
+        $query->bind_param("iii", $competitionId, $videoId, $userId);
+
+        return $this->isExecuted($query);
+    }
+
+    /**
+     * Delete a vote from an entry in a competition
+     *
+     * @param int $competitionId The competition that the entry is in
+     * @param int $videoId The video that the vote is being deleted from
+     * @param int $userId The ID of the user deleting the vote
+     */
+    public function deleteVote($competitionId, $videoId, $userId){
+
+        $query = $this->dbh->prepare("delete from competition_votes where competition_id = ? and
+                                    video_id = ? and user_id = ?");
+        $query->bind_param("iii", $competitionId, $videoId, $userId);
+
+        return $this->isExecuted($query);
+    }
+
 }
 
 ?>

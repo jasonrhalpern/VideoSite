@@ -223,4 +223,49 @@ class UserTest extends PHPUnit_Framework_TestCase{
         $this->assertFalse($ten->hasValidEmail());
         unset($ten);
     }
+
+    public function testHasVoted(){
+        $this->dbConnection->insertUser($this->userOne);
+        $loggedIn = User::login($this->userOne->getEmail(), $this->userOne->getPassword());
+
+        $loggedIn->addVote(1, 1);
+        $this->assertTrue($loggedIn->hasVoted(1));
+        $this->assertFalse($loggedIn->hasVoted(2));
+        $loggedIn->addVote(1, 2);
+        $this->assertTrue($loggedIn->hasVoted(2));
+        $loggedIn->deleteVote(1, 1);
+        $loggedIn->deleteVote(1, 2);
+
+        $this->dbConnection->deleteUser($loggedIn);
+    }
+
+    public function testGetNumberOfVotesRemaining(){
+        $this->dbConnection->insertUser($this->userOne);
+        $loggedIn = User::login($this->userOne->getEmail(), $this->userOne->getPassword());
+
+        $loggedIn->addVote(1, 1);
+        $this->assertTrue($loggedIn->hasVoted(1));
+        $this->assertFalse($loggedIn->hasVoted(2));
+        $this->assertEquals($loggedIn->getNumberOfVotesRemaining(1), 2);
+        $this->assertFalse($loggedIn->addVote(1, 1));
+
+        $loggedIn->addVote(1, 2);
+        $this->assertTrue($loggedIn->hasVoted(2));
+        $this->assertEquals($loggedIn->getNumberOfVotesRemaining(1), 1);
+        $this->assertFalse($loggedIn->addVote(1, 2));
+
+        $loggedIn->addVote(1, 3);
+        $this->assertTrue($loggedIn->hasVoted(3));
+        $this->assertEquals($loggedIn->getNumberOfVotesRemaining(1), 0);
+        $this->assertFalse($loggedIn->addVote(1, 3));
+
+        $this->assertFalse($loggedIn->addVote(1, 4));
+        $this->assertFalse($loggedIn->addVote(1, 5));
+
+        $loggedIn->deleteVote(1, 1);
+        $loggedIn->deleteVote(1, 2);
+        $loggedIn->deleteVote(1, 3);
+
+        $this->dbConnection->deleteUser($loggedIn);
+    }
 }

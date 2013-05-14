@@ -110,7 +110,16 @@ class MySQLTest extends PHPUnit_Framework_TestCase{
     }
 
     public function testDeleteComment(){
-        //$this->assertTrue($this->dbConnection->insertComment($this->comment));
+        $commentId = $this->dbConnection->mostRecentCommentId('Daisies Egg');
+        $this->assertTrue($this->dbConnection->deleteComment($commentId));
+    }
+
+    public function testAddVote(){
+        $this->assertTrue($this->dbConnection->addVote(1, 1, 1));
+    }
+
+    public function testDeleteVote(){
+        $this->assertTrue($this->dbConnection->deleteVote(1, 1, 1));
     }
 
 }

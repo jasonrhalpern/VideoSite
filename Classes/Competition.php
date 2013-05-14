@@ -15,6 +15,7 @@ class Competition extends Production{
     protected $entryFee; //double
     protected $type; //group or individual, ENUM
     protected $category; //music, food, fashion, etc, ENUM
+    private static $VOTES_PER_COMPETITION = 3;
 
 
     public function __construct($title, $description, $startDate, $endDate, $entryFee,
@@ -131,6 +132,15 @@ class Competition extends Production{
 
     public function setCategory($category){
         $this->category = $category;
+    }
+
+    /**
+     * Return the number of votes a user will receive for each competition
+     *
+     * @return int The number of votes
+     */
+    public static function getVotesPerCompetition(){
+        return self::$VOTES_PER_COMPETITION;
     }
 
     public function start()

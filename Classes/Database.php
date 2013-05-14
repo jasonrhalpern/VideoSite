@@ -50,6 +50,9 @@ interface Database
     public function insertComment($comment);
     public function deleteComment($comment);
 
+    public function addVote($competitionId, $videoId, $userId);
+    public function deleteVote($competitionId, $videoId, $userId);
+
 }
 
 ?>
