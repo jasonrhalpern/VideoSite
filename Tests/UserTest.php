@@ -118,13 +118,43 @@ class UserTest extends PHPUnit_Framework_TestCase{
     }
 
     public function testRegister(){
-        $this->assertTrue($this->userThree->register());
+        $registerArray = $this->userThree->register();
+        $this->assertTrue($registerArray['valid']);
 
         $this->assertTrue($this->dbConnection->insertUser($this->userFour));
-        $this->assertFalse($this->userFour->register());
+        $registerArray = $this->userFour->register();
+        $this->assertFalse($registerArray['valid']);
+        $this->assertContains('This username is already taken', $registerArray['errors']);
+        $this->assertContains('This email is already in our system', $registerArray['errors']);
+        $this->assertNotContains('Your password must be at least 5 characters long', $registerArray['errors']);
+        $this->assertNotContains('Your username must be between 4 and 20 characters long', $registerArray['errors']);
+        $this->assertNotContains('Your username can only contain letters and numbers', $registerArray['errors']);
 
-        $this->assertFalse($this->userOne->register());
-        $this->assertFalse($this->userFive->register());
+        $registerArray = $this->userOne->register();
+        $this->assertFalse($registerArray['valid']);
+        $this->assertContains('This username is already taken', $registerArray['errors']);
+        $this->assertNotContains('This email is already in our system', $registerArray['errors']);
+        $this->assertNotContains('Your password must be at least 5 characters long', $registerArray['errors']);
+        $this->assertNotContains('Your username must be between 4 and 20 characters long', $registerArray['errors']);
+        $this->assertNotContains('Your username can only contain letters and numbers', $registerArray['errors']);
+
+        $registerArray = $this->userFive->register();
+        $this->assertFalse($registerArray['valid']);
+        $this->assertContains('This email is already in our system', $registerArray['errors']);
+        $this->assertNotContains('This username is already taken', $registerArray['errors']);
+        $this->assertNotContains('Your password must be at least 5 characters long', $registerArray['errors']);
+        $this->assertNotContains('Your username must be between 4 and 20 characters long', $registerArray['errors']);
+        $this->assertNotContains('Your username can only contain letters and numbers', $registerArray['errors']);
+
+        $seven = new User('Donope Gangsta', '@aol.com', 'G!', 1, 'tan');
+        $registerArray = $seven->register();
+        $this->assertFalse($registerArray['valid']);
+        $this->assertContains('This email is not valid', $registerArray['errors']);
+        $this->assertContains('Your username must be between 4 and 20 characters long', $registerArray['errors']);
+        $this->assertContains('Your username can only contain letters and numbers', $registerArray['errors']);
+        $this->assertContains('Your password must be at least 5 characters long', $registerArray['errors']);
+        $this->assertNotContains('This username is already taken', $registerArray['errors']);
+        $this->assertNotContains('This email is already in our system', $registerArray['errors']);
 
         $loggedIn = User::login($this->userThree->getEmail(), $this->userThree->getPassword());
         $this->assertContainsOnlyInstancesOf('User', array($loggedIn));
@@ -136,13 +166,15 @@ class UserTest extends PHPUnit_Framework_TestCase{
 
     public function testChangeUsername(){
         $one = new User('Donope Gangsta', 'dandepa98k@aol.com', 'GMoney589', 1, 'tanya');
-        $this->assertTrue($one->register());
+        $registerArray = $one->register();
+        $this->assertTrue($registerArray['valid']);
         $this->assertTrue($one->changeUsername('Jameson Jones11'));
         $loggedInOne = User::login($one->getEmail(), $one->getPassword());
         $this->assertEquals($loggedInOne->getUsername(), 'Jameson Jones11');
 
         $two = new User('Stevance Dominque1', 'steveie.domzz@yahoo.com', 'StevieDomzz1', 1, 'tanya');
-        $this->assertTrue($two->register());
+        $registerArray = $two->register();
+        $this->assertTrue($registerArray['valid']);
         $this->assertFalse($two->changeUsername('Jameson Jones11'));
         $this->assertTrue($two->changeUsername('Pinkus Maximum 7'));
 
@@ -153,7 +185,8 @@ class UserTest extends PHPUnit_Framework_TestCase{
 
     public function testChangePassword(){
         $one = new User('Donope Gangsta', 'danny82q1@aol.com', 'GMoney5896', 1, 'tanya');
-        $this->assertTrue($one->register());
+        $registerArray = $one->register();
+        $this->assertTrue($registerArray['valid']);
         $this->assertTrue($one->changePassword('simeon'));
         $this->assertEquals($one->getPassword(), 'simeon');
         $loggedInOne = User::login($one->getEmail(), 'simeon');
@@ -168,7 +201,8 @@ class UserTest extends PHPUnit_Framework_TestCase{
 
     public function testResetPassword(){
         $one = new User('Donope Gangsta', 'tornaldz30t@aol.com', 'GMoney6612', 1, 'tanya');
-        $this->assertTrue($one->register());
+        $registerArray = $one->register();
+        $this->assertTrue($registerArray['valid']);
         $oldPassword = $one->getPassword();
         $newPassword = $one->resetPassword();
         $failedLogin = User::login($one->getEmail(), $oldPassword);

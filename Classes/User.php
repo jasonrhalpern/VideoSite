@@ -36,30 +36,50 @@ class User extends Person{
      * Register a user. Before registering, we have to make sure the user's
      * details are unique
      *
-     * @return bool True if we registered the user, False otherwise
+     * @return array string[]
      */
     public function register(){
 
-        if($this->hasDuplicateEmail())
-            return false;
+        $register['valid'] = true;
 
-        if($this->hasDuplicateUsername())
-            return false;
+        if($this->hasDuplicateEmail()){
+            $register['valid'] = false;
+            $register['errors'][] = 'This email is already in our system';
+        }
 
-        if(!$this->hasValidEmail())
-            return false;
+        if($this->hasDuplicateUsername()){
+            $register['valid'] = false;
+            $register['errors'][] = 'This username is already taken';
+        }
 
-        if(!$this->hasValidPassword())
-            return false;
+        if(!$this->hasValidEmail()){
+            $register['valid'] = false;
+            $register['errors'][] = 'This email is not valid';
+        }
 
-        if(!$this->hasValidUsername())
-            return false;
+        if(!$this->hasValidPassword()){
+            $register['valid'] = false;
+            $register['errors'][] = 'Your password must be at least 5 characters long';
+        }
 
-        if(!$this->hasOnlyAlphanumericCharacters())
-            return false;
+        if(!$this->hasValidUsername()){
+            $register['valid'] = false;
+            $register['errors'][] = 'Your username must be between 4 and 20 characters long';
+        }
 
-        return $this->db->insertUser($this);
+        if(!$this->hasOnlyAlphanumericCharacters()){
+            $register['valid'] = false;
+            $register['errors'][] = 'Your username can only contain letters and numbers';
+        }
 
+        if($register['valid'] == true){
+            if(!$this->db->insertUser($this)){
+                $register['valid'] = false;
+                $register['error'][] = 'We could not complete the sign up at this time, please try again later';
+            }
+        }
+
+        return $register;
     }
 
     /**
