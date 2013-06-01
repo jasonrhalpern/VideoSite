@@ -42,40 +42,59 @@ class User extends Person{
 
         $register['valid'] = true;
 
+        $username = $this->getUsername();
+        $password = $this->getPassword();
+        $email = $this->getEmail();
+        $name = $this->getName();
+
+        if(!(isset($username) && strlen($username))){
+            $register['errors'][] = "You must enter a username";
+        }
+
+        if(!(isset($password) && strlen($password))){
+            $register['errors'][] = "You must enter a password";
+        }
+
+        if(!(isset($email) && strlen($email))){
+            $register['errors'][] = "You must enter an email";
+        }
+
+        if(!(isset($name) && strlen($name))){
+            $register['errors'][] = "You must enter a name";
+        }
+
         if($this->hasDuplicateEmail()){
-            $register['valid'] = false;
             $register['errors'][] = 'This email is already in our system';
         }
 
         if($this->hasDuplicateUsername()){
-            $register['valid'] = false;
             $register['errors'][] = 'This username is already taken';
         }
 
         if(!$this->hasValidEmail()){
-            $register['valid'] = false;
             $register['errors'][] = 'This email is not valid';
         }
 
         if(!$this->hasValidPassword()){
-            $register['valid'] = false;
             $register['errors'][] = 'Your password must be at least 5 characters long';
         }
 
         if(!$this->hasValidUsername()){
-            $register['valid'] = false;
             $register['errors'][] = 'Your username must be between 4 and 20 characters long';
         }
 
         if(!$this->hasOnlyAlphanumericCharacters()){
-            $register['valid'] = false;
             $register['errors'][] = 'Your username can only contain letters and numbers';
+        }
+
+        if(array_key_exists('errors', $register)){
+            $register['valid'] = false;
         }
 
         if($register['valid'] == true){
             if(!$this->db->insertUser($this)){
                 $register['valid'] = false;
-                $register['error'][] = 'We could not complete the sign up at this time, please try again later';
+                $register['errors'][] = 'We could not complete the sign up at this time, please try again later';
             }
         }
 

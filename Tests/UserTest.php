@@ -6,6 +6,7 @@
 require_once 'PHPUnit/Autoload.php';
 require_once dirname(__FILE__) . '/../Classes/User.php';
 require_once dirname(__FILE__) . '/../Classes/MySQL.php';
+require_once dirname(__FILE__) . '/../Classes/ValidationHelper.php';
 
 class UserTest extends PHPUnit_Framework_TestCase{
 
@@ -155,6 +156,46 @@ class UserTest extends PHPUnit_Framework_TestCase{
         $this->assertContains('Your password must be at least 5 characters long', $registerArray['errors']);
         $this->assertNotContains('This username is already taken', $registerArray['errors']);
         $this->assertNotContains('This email is already in our system', $registerArray['errors']);
+
+        $eight = new User('Donope Gangstayyyy', '', 'Goodddee', 1, 'tannnnn');
+        $registerArray = $eight->register();
+        $this->assertFalse($registerArray['valid']);
+        $this->assertContains("You must enter an email", $registerArray['errors']);
+        $this->assertNotContains("You must enter a password", $registerArray['errors']);
+        $this->assertNotContains("You must enter a username", $registerArray['errors']);
+        $this->assertNotContains("You must enter a name", $registerArray['errors']);
+
+        $eight = new User('Donope Gangstayyyy', "t@aol.com", '', 1, 'tannnnn');
+        $registerArray = $eight->register();
+        $this->assertFalse($registerArray['valid']);
+        $this->assertNotContains("You must enter an email", $registerArray['errors']);
+        $this->assertNotContains("You must enter a password", $registerArray['errors']);
+        $this->assertContains("You must enter a username", $registerArray['errors']);
+        $this->assertNotContains("You must enter a name", $registerArray['errors']);
+
+        $eight = new User('Donope Gangstayyyy', "t@aol.com", 'gooddeeee', 1, '');
+        $registerArray = $eight->register();
+        $this->assertFalse($registerArray['valid']);
+        $this->assertNotContains("You must enter an email", $registerArray['errors']);
+        $this->assertContains("You must enter a password", $registerArray['errors']);
+        $this->assertNotContains("You must enter a username", $registerArray['errors']);
+        $this->assertNotContains("You must enter a name", $registerArray['errors']);
+
+        $eight = new User('', "t@aol.com", 'gooddeeee', 1, 'taaaaaa');
+        $registerArray = $eight->register();
+        $this->assertFalse($registerArray['valid']);
+        $this->assertNotContains("You must enter an email", $registerArray['errors']);
+        $this->assertNotContains("You must enter a password", $registerArray['errors']);
+        $this->assertNotContains("You must enter a username", $registerArray['errors']);
+        $this->assertContains("You must enter a name", $registerArray['errors']);
+
+        $eight = new User('Donope Gangstayyyy', "rtewrtwert", 'Goodddee', 1, 'tannnnn');
+        $registerArray = $eight->register();
+        $this->assertFalse($registerArray['valid']);
+        $this->assertNotContains("You must enter an email", $registerArray['errors']);
+        $this->assertNotContains("You must enter a password", $registerArray['errors']);
+        $this->assertNotContains("You must enter a username", $registerArray['errors']);
+        $this->assertNotContains("You must enter a name", $registerArray['errors']);
 
         $loggedIn = User::login($this->userThree->getEmail(), $this->userThree->getPassword());
         $this->assertContainsOnlyInstancesOf('User', array($loggedIn));
