@@ -35,8 +35,25 @@ class CompetitorTest extends PHPUnit_Framework_TestCase{
         $user = User::login($this->user->getEmail(), $this->user->getPassword());
         $competitor = new Competitor($user);
 
+        $video = new Video('', 'battle of tha century', $competitor->getId());
+        $joinCompetitionArray = $competitor->addVideoToCompetition($this->competition, $video, '/var/www/Tests/TestFiles/test.mov');
+        $this->assertFalse($joinCompetitionArray['valid']);
+        $this->assertContains("You must enter a title for the video", $joinCompetitionArray['errors']);
+        $this->assertNotContains("You must enter a description for the video", $joinCompetitionArray['errors']);
+        $this->assertNotContains("We could not add your video to the competition at this time,
+                                                please try again later", $joinCompetitionArray['errors']);
+
+        $video = new Video('Hicks vss Gangstaz', '', $competitor->getId());
+        $joinCompetitionArray = $competitor->addVideoToCompetition($this->competition, $video, '/var/www/Tests/TestFiles/test.mov');
+        $this->assertFalse($joinCompetitionArray['valid']);
+        $this->assertNotContains("You must enter a title for the video", $joinCompetitionArray['errors']);
+        $this->assertContains("You must enter a description for the video", $joinCompetitionArray['errors']);
+        $this->assertNotContains("We could not add your video to the competition at this time,
+                                                please try again later", $joinCompetitionArray['errors']);
+
         $video = new Video('Hicks vss Gangstaz', 'battle of tha century', $competitor->getId());
-        $competitor->addVideoToCompetition($this->competition, $video, '/var/www/Tests/TestFiles/test.mov');
+        $joinCompetitionArray = $competitor->addVideoToCompetition($this->competition, $video, '/var/www/Tests/TestFiles/test.mov');
+        $this->assertTrue($joinCompetitionArray['valid']);
 
         $videoId = $this->dbConnection->mostRecentVideoId($user->getId());
         $video->setVideoId($videoId);

@@ -34,7 +34,7 @@ class User extends Person{
 
     /**
      * Register a user. Before registering, we have to make sure the user's
-     * details are unique
+     * details exist and are unique
      *
      * @return array string[]
      */

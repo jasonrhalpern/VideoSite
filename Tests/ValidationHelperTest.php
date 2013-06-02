@@ -23,7 +23,8 @@ class ValidationHelperTest extends PHPUnit_Framework_TestCase{
         $errors = ValidationHelper::inputExists($required, $input);
         $this->assertNotContains("You must enter a email", $errors);
         $this->assertContains("You must enter a login", $errors);
-        $this->assertNotContains("You must enter a password", $errors);
+        $this->assertNotContains("We could not add your video to the competition at this time,
+                                    please try again later", $errors);
 
         $input['email'] = "";
         $input['login'] = "";
@@ -31,7 +32,8 @@ class ValidationHelperTest extends PHPUnit_Framework_TestCase{
         $errors = ValidationHelper::inputExists($required, $input);
         $this->assertContains("You must enter a email", $errors);
         $this->assertContains("You must enter a login", $errors);
-        $this->assertContains("You must enter a password", $errors);
+        $this->assertContains("We could not add your video to the competition at this time,
+                                please try again later", $errors);
 
         $input['email'] = "test";
         $input['login'] = "test";
