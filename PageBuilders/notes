@@ -1,0 +1,27 @@
+HOMEPAGE
+
+Current Competitors
+-competition where start_date before or equal to today and end_date after or equal to today
+$today = DateHelper::currentDate()
+select * from competition where start_date  <= $today and end_date >= $today
+
+Upcoming Competition
+- competition where start_date after today
+select * from competition where start_date > $today
+
+Recent Winners
+-join competition, video and competition_winner with competition_winner and video joined on video_id and
+and competition and competition_winner joined on competition.id and competition_winner.competition_id
+select * from competition, video, competition_winner where competition.id = competition_winner.competition_id
+and competition_winner.video_id = video.video_id
+
+COMPETITION PAGE
+-Select competition
+-if competition is over, select winner and runner up as well as all entries in decreasing vote order
+-if its underway, select all entries in sorted votes decreasing order
+-if its not yet started, show details for getting started and joining
+-in this section, we select the entries by joining competition, competition_entries and video. We join competition
+and competition_entries on competition.id and competition_entries.competition_id, competition_entries and video
+on video_id.
+
+select * from competition where id = ?
