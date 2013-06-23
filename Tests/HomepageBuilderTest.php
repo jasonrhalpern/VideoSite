@@ -7,6 +7,9 @@
 require_once dirname(__FILE__) . '/../Classes/MySQL.php';
 require_once dirname(__FILE__) . '/../Classes/Competition.php';
 require_once dirname(__FILE__) . '/../Classes/DateHelper.php';
+require_once dirname(__FILE__) . '/../Classes/User.php';
+require_once dirname(__FILE__) . '/../Classes/Video.php';
+require_once dirname(__FILE__) . '/../PageBuilders/HomepageBuilder.php';
 
 class HomepageBuilderTest extends PHPUnit_Framework_TestCase{
 
@@ -25,6 +28,8 @@ class HomepageBuilderTest extends PHPUnit_Framework_TestCase{
     protected $competitionSixId;
     protected $competitionSeven;
     protected $competitionSevenId;
+    protected $userOne;
+    protected $video;
 
     public function setUp(){
         $this->dbConnection = new MySQL();
@@ -77,6 +82,17 @@ class HomepageBuilderTest extends PHPUnit_Framework_TestCase{
             2.99, 'Individual', 'Acting');
         $this->dbConnection->insertCompetition($this->competitionSeven);
         $this->competitionSevenId = $this->dbConnection->mostRecentCompetitionId();
+
+        $this->userOne = new User('blahhhh', 'blaaaahhh@aol.com', 'blah2394', 1, 'blahhh');
+        $this->dbConnection->insertUser($this->userOne);
+
+        $user = User::login($this->userOne->getEmail(), $this->userOne->getPassword());
+        $this->video = new Video('Hicks vss Gangstas booyah', 'battlezz of tha century', $user->getId());
+        $this->dbConnection->insertVideo($this->video);
+        $videoId = $this->dbConnection->mostRecentVideoId($user->getId());
+        $this->video = Video::loadVideoById($videoId);
+
+        $this->dbConnection->insertCompetitionWinner(1, $videoId);
     }
 
     public function tearDown(){
@@ -87,6 +103,10 @@ class HomepageBuilderTest extends PHPUnit_Framework_TestCase{
         $this->dbConnection->deleteCompetition($this->competitionFiveId);
         $this->dbConnection->deleteCompetition($this->competitionSixId);
         $this->dbConnection->deleteCompetition($this->competitionSevenId);
+        $this->dbConnection->deleteCompetitionWinner(1, $this->video->getVideoId());
+        $this->dbConnection->deleteUser($this->userOne);
+        $this->dbConnection->deleteVideo($this->video);
+
 
         unset($this->competitionOne);
         unset($this->competitionTwo);
@@ -104,15 +124,43 @@ class HomepageBuilderTest extends PHPUnit_Framework_TestCase{
         unset($this->competitionSixId);
         unset($this->competitionSevenId);
 
+        unset($this->userOne);
+        unset($this->video);
         unset($this->dbConnection);
     }
 
     public function testBuildHomepage(){
+
         $this->assertTrue(true);
     }
 
     public function testLoadCurrentCompetitions(){
-        $this->assertTrue(true);
+        $homepageBuilder = new HomepageBuilder();
+        $currentCompetitions = $homepageBuilder->loadCurrentCompetitions();
+
+        $this->assertFalse(empty($currentCompetitions));
+        $this->assertEquals(count($currentCompetitions), 3);
+
+        $this->assertEquals($currentCompetitions[0]["title"], "acting like deniro");
+        $this->assertEquals($currentCompetitions[0]["description"], "do your best deniro impression");
+        $this->assertEquals($currentCompetitions[0]["entry_fee"], 2.99);
+        $this->assertEquals($currentCompetitions[0]["type"], "Individual");
+        $this->assertEquals($currentCompetitions[0]["category"], "Acting");
+        $this->assertEquals($currentCompetitions[0]["participants"], 0);
+
+        $this->assertEquals($currentCompetitions[1]["title"], "acting like pacino");
+        $this->assertEquals($currentCompetitions[1]["description"], "do your best pacino impression");
+        $this->assertEquals($currentCompetitions[1]["entry_fee"], 2.99);
+        $this->assertEquals($currentCompetitions[1]["type"], "Individual");
+        $this->assertEquals($currentCompetitions[1]["category"], "Acting");
+        $this->assertEquals($currentCompetitions[1]["participants"], 0);
+
+        $this->assertEquals($currentCompetitions[2]["title"], "acting like robin williams");
+        $this->assertEquals($currentCompetitions[2]["description"], "do your best williams impression");
+        $this->assertEquals($currentCompetitions[2]["entry_fee"], 2.99);
+        $this->assertEquals($currentCompetitions[2]["type"], "Individual");
+        $this->assertEquals($currentCompetitions[2]["category"], "Comedy");
+        $this->assertEquals($currentCompetitions[2]["participants"], 0);
     }
 
     public function testLoadUpcomingCompetitions(){

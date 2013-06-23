@@ -16,7 +16,7 @@ class CompetitorTest extends PHPUnit_Framework_TestCase{
     protected $dbConnection;
 
     public function setUp(){
-        $this->competition = Competition::loadCompetitionById(1);
+        $this->competition = Competition::loadCompetitionById(646);
         $this->s3Client = new S3();
         $this->user = new User('Stevie Boyko', 'georgeiee106@aol.com', 'Stevie1239', 1, 'teddie');
         $this->dbConnection = new MySQL();

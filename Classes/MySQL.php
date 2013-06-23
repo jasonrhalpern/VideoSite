@@ -584,6 +584,7 @@ class MySQL implements Database{
      * @param int $competitionId The competition that the entry is in
      * @param int $videoId The video that the vote is being added to
      * @param int $userId The ID of the user casting the vote
+     * @return bool True if the vote was added to the database, false otherwise
      */
     public function addVote($competitionId, $videoId, $userId){
 
@@ -599,6 +600,7 @@ class MySQL implements Database{
      * @param int $competitionId The competition that the entry is in
      * @param int $videoId The video that the vote is being deleted from
      * @param int $userId The ID of the user deleting the vote
+     * @return bool True if the vote was deleted from the database, false otherwise
      */
     public function deleteVote($competitionId, $videoId, $userId){
 
@@ -607,6 +609,136 @@ class MySQL implements Database{
         $query->bind_param("iii", $competitionId, $videoId, $userId);
 
         return $this->isExecuted($query);
+    }
+
+    /**
+     * Select a winner for a certain competition.
+     *
+     * @param $competitionId The id of the competition
+     * @param $videoId The id of the video that is the winner
+     * @return bool True if the winner has been added to the database, false otherwise
+     */
+    public function insertCompetitionWinner($competitionId, $videoId){
+
+        $query = $this->dbh->prepare("insert into competition_winner values(?, ?)");
+        $query->bind_param("ii", $competitionId, $videoId);
+
+        return $this->isExecuted($query);
+    }
+
+
+    /**
+     * Remove a winner for a certain competition.
+     *
+     * @param $competitionId The id of the competition
+     * @return bool True if the winner has been removed from the database, false otherwise
+     */
+    public function deleteCompetitionWinner($competitionId){
+        $query = $this->dbh->prepare("delete from competition_winner where competition_id = ?");
+        $query->bind_param("i", $competitionId);
+
+        return $this->isExecuted($query);
+    }
+
+    /**
+     * Check if a winner already exists for a competition.
+     *
+     * @param $competitionId The id of the competition
+     * @return bool True if a winner already exists, false otherwise
+     */
+    public function competitionWinnerExists($competitionId){
+
+        $query = $this->dbh->prepare("select * from competition_winner where competition_id = ?");
+        $query->bind_param("i", $competitionId);
+
+        return $this->dataExists($query);
+    }
+
+    /**
+     * Select a runner up for a certain competition.
+     *
+     * @param $competitionId The id of the competition
+     * @param $videoId The id of the video that is the runner up
+     * @return bool True if the runner up has been added to the database, false otherwise
+     */
+    public function insertCompetitionRunnerUp($competitionId, $videoId){
+        $query = $this->dbh->prepare("insert into competition_runner_up values(?, ?)");
+        $query->bind_param("ii", $competitionId, $videoId);
+
+        return $this->isExecuted($query);
+    }
+
+    /**
+     * Remove a runner up for a certain competition.
+     *
+     * @param $competitionId The id of the competition
+     * @return bool True if the runner up has been removed from the database, false otherwise
+     */
+    public function deleteCompetitionRunnerUp($competitionId){
+        $query = $this->dbh->prepare("delete from competition_runner_up where competition_id = ?");
+        $query->bind_param("i", $competitionId);
+
+        return $this->isExecuted($query);
+    }
+
+    /**
+     * Check if a runner up already exists for a competition.
+     *
+     * @param $competitionId The id of the competition
+     * @return bool True if a runner up already exists, false otherwise
+     */
+    public function competitionRunnerUpExists($competitionId){
+        $query = $this->dbh->prepare("select * from competition_runner_up where competition_id = ?");
+        $query->bind_param("i", $competitionId);
+
+        return $this->dataExists($query);
+    }
+
+    /**
+     * Get the winner of a certain competition
+     *
+     * @param $competitionId The id of the competition we want the winner for
+     * @return int|bool The id of the video that is the winner, false if no winner exists
+     */
+    public function getCompetitionWinner($competitionId){
+        $query = $this->dbh->prepare("select * from competition_winner where competition_id = ?");
+        $query->bind_param("i", $competitionId);
+        $query->execute();
+        $query->bind_result($$competitionId, $videoId);
+        if($query->fetch())
+            return $videoId;
+        else
+            return false;
+    }
+
+    /**
+     * Get the runner up of a certain competition
+     *
+     * @param $competitionId The id of the competition we want the runner up for
+     * @return int|bool The id of the video that is the runner up, false if no runner up exists
+     */
+    public function getCompetitionRunnerUp($competitionId){
+        $query = $this->dbh->prepare("select * from competition_runner_up where competition_id = ?");
+        $query->bind_param("i", $competitionId);
+        $query->execute();
+        $query->bind_result($$competitionId, $videoId);
+        if($query->fetch())
+            return $videoId;
+        else
+            return false;
+    }
+
+    /**
+     * Get the number of participants in a specific competition
+     *
+     * @param $competitionId The id of the competition
+     * @return int|bool The number of participants in the competition, false if it doesn't exist
+     */
+    public function getNumParticipants($competitionId){
+        $query = $this->dbh->prepare("select COUNT(*) from competition_entries where competition_id = ?");
+        $query->bind_param("i", $competitionId);
+
+        return $this->getNumberOfRows($query);
     }
 
 }

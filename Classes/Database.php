@@ -47,6 +47,14 @@ interface Database
     public function insertCompetitionEntry($competitionId, $videoId);
     public function deleteCompetitionEntry($competitionId, $videoId);
 
+    public function insertCompetitionWinner($competitionId, $videoId);
+    public function deleteCompetitionWinner($competitionId);
+    public function competitionWinnerExists($competitionId);
+
+    public function insertCompetitionRunnerUp($competitionId, $videoId);
+    public function deleteCompetitionRunnerUp($competitionId);
+    public function competitionRunnerUpExists($competitionId);
+
     public function insertComment($comment);
     public function deleteComment($comment);
 

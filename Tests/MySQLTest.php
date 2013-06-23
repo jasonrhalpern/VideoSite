@@ -122,4 +122,55 @@ class MySQLTest extends PHPUnit_Framework_TestCase{
         $this->assertTrue($this->dbConnection->deleteVote(1, 1, 1));
     }
 
+    public function testInsertCompetitionWinner(){
+        $this->assertTrue($this->dbConnection->insertCompetitionWinner(2, 5));
+    }
+
+    public function testCompetitionWinnerExists(){
+        $this->assertTrue($this->dbConnection->competitionWinnerExists(2));
+        $this->assertFalse($this->dbConnection->competitionWinnerExists(3));
+    }
+
+    public function testGetCompetitionWinner(){
+        $winnerId = $this->dbConnection->getCompetitionWinner(2);
+        $this->assertEquals($winnerId, 5);
+
+        $winnerId = $this->dbConnection->getCompetitionWinner(3);
+        $this->assertFalse($winnerId);
+    }
+
+    public function testDeleteCompetitionWinner(){
+        $this->assertTrue($this->dbConnection->deleteCompetitionWinner(2));
+    }
+
+    public function testInsertCompetitionRunnerUp(){
+        $this->assertTrue($this->dbConnection->insertCompetitionRunnerUp(6, 8));
+    }
+
+    public function testCompetitionRunnerUpExists(){
+        $this->assertTrue($this->dbConnection->competitionRunnerUpExists(6));
+        $this->assertFalse($this->dbConnection->competitionRunnerUpExists(7));
+    }
+
+    public function testGetCompetitionRunnerUp(){
+        $winnerId = $this->dbConnection->getCompetitionRunnerUp(6);
+        $this->assertEquals($winnerId, 8);
+
+        $winnerId = $this->dbConnection->getCompetitionRunnerUp(3);
+        $this->assertFalse($winnerId);
+    }
+
+    public function testDeleteCompetitionRunnerUp(){
+        $this->assertTrue($this->dbConnection->deleteCompetitionRunnerUp(6));
+    }
+
+    public function testGetNumParticipants(){
+        $this->assertTrue($this->dbConnection->insertCompetitionEntry(6, 1));
+        $this->assertTrue($this->dbConnection->insertCompetitionEntry(6, 2));
+
+        $this->assertEquals($this->dbConnection->getNumParticipants(6), 2);
+
+        $this->assertTrue($this->dbConnection->deleteCompetitionEntry(6, 1));
+        $this->assertTrue($this->dbConnection->deleteCompetitionEntry(6, 2));
+    }
 }

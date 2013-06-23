@@ -17,7 +17,7 @@ class S3Test extends PHPUnit_Framework_TestCase{
     public function setUp(){
         $this->series = new Series(1, 'The Crazies Are Out Bakonka', 'An in depth look into an insane asylum',
             'Documentary', 1);
-        $this->competition = Competition::loadCompetitionById(1);
+        $this->competition = Competition::loadCompetitionById(646);
         $this->s3Client = new S3();
     }
 

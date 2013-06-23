@@ -23,26 +23,26 @@ class HomepageBuilder{
     }
 
     public function loadCurrentCompetitions(){
-        $today = DateHelper::currentDate();
         $query = $this->getDBConnection()->prepare("select * from competition
-                                                  where start_date <= $today and end_date >= $today
+                                                  where start_date <= CURDATE() and end_date >= CURDATE()
                                                   order by end_date asc");
         $query->execute();
+        $query->store_result();
         $query->bind_result($id, $title, $description, $start_date, $end_date, $entry_fee, $comp_type, $category);
 
         $count = 0;
         $currentCompetitions = array();
         while($query->fetch()){
-            //push the competitions into array
             //WHAT ABOUT # PARTICIPANTS??
             $currentCompetitions[$count]["id"] = $id;
-            $currentCompetitions[$count]["title"] = $id;
+            $currentCompetitions[$count]["title"] = $title;
             $currentCompetitions[$count]["description"] = $description;
             $currentCompetitions[$count]["start_date"] = $start_date;
             $currentCompetitions[$count]["end_date"] = $end_date;
             $currentCompetitions[$count]["entry_fee"] = $entry_fee;
             $currentCompetitions[$count]["type"] = $comp_type;
             $currentCompetitions[$count]["category"] = $category;
+            $currentCompetitions[$count]["participants"] = $this->db->getNumParticipants($id);
             $count++;
         }
 
@@ -54,13 +54,14 @@ class HomepageBuilder{
         $query = $this->getDBConnection()->prepare("select * from competition where start_date > $today
                                                   order by start_date desc");
         $query->execute();
+        $query->store_result();
         $query->bind_result($id, $title, $description, $start_date, $end_date, $entry_fee, $comp_type, $category);
         $count = 0;
         $upcomingCompetitions = array();
         while($query->fetch()){
             //push the competitions into array
             $upcomingCompetitions[$count]["id"] = $id;
-            $upcomingCompetitions[$count]["title"] = $id;
+            $upcomingCompetitions[$count]["title"] = $title;
             $upcomingCompetitions[$count]["description"] = $description;
             $upcomingCompetitions[$count]["start_date"] = $start_date;
             $upcomingCompetitions[$count]["end_date"] = $end_date;
@@ -75,11 +76,13 @@ class HomepageBuilder{
 
     public function loadRecentWinners(){
         $query = $this->getDBConnection()->prepare("select comp.id, comp.title, comp.category,
-                                                    v.video_id, v.title, v.likes, v.created_by
-                                                    from competition comp, video v, competition_winner cw
+                                                    v.video_id, v.title, v.likes, v.created_by, users.username
+                                                    from competition comp, video v, competition_winner cw, users u
                                                     where comp.id = cw.competition_id
-                                                    and cw.video_id = v.video_id");
+                                                    and cw.video_id = v.video_id
+                                                    and video.created_by = users.user_id");
         $query->execute();
+        $query->store_result();
         $query->bind_result($competitionId, $competitionTitle, $competitionCategory, $videoId, $videoTitle,
                             $videoLikes, $videoCreatedBy);
         $count = 0;
