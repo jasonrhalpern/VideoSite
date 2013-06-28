@@ -35,50 +35,50 @@ class HomepageBuilderTest extends PHPUnit_Framework_TestCase{
         $this->dbConnection = new MySQL();
 
         $this->competitionOne = new Competition("acting like deniro", "do your best deniro impression",
-            DateHelper::datePlusDays(DateHelper::currentDate(), -3),
-            DateHelper::datePlusDays(DateHelper::currentDate(), 1),
+            DateHelper::datePlusDays(DateHelper::currentDate(), -4),
+            DateHelper::datePlusDays(DateHelper::currentDate(), 2),
             2.99, 'Individual', 'Acting');
         $this->dbConnection->insertCompetition($this->competitionOne);
         $this->competitionOneId = $this->dbConnection->mostRecentCompetitionId();
 
         $this->competitionTwo = new Competition("acting like pacino", "do your best pacino impression",
-            DateHelper::datePlusDays(DateHelper::currentDate(), -2),
-            DateHelper::datePlusDays(DateHelper::currentDate(), 2),
+            DateHelper::datePlusDays(DateHelper::currentDate(), -3),
+            DateHelper::datePlusDays(DateHelper::currentDate(), 3),
             2.99, 'Individual', 'Acting');
         $this->dbConnection->insertCompetition($this->competitionTwo);
         $this->competitionTwoId = $this->dbConnection->mostRecentCompetitionId();
 
         $this->competitionThree = new Competition("acting like robin williams", "do your best williams impression",
-            DateHelper::datePlusDays(DateHelper::currentDate(), 0),
+            DateHelper::datePlusDays(DateHelper::currentDate(), -2),
             DateHelper::datePlusDays(DateHelper::currentDate(), 4),
             2.99, 'Individual', 'Comedy');
         $this->dbConnection->insertCompetition($this->competitionThree);
         $this->competitionThreeId= $this->dbConnection->mostRecentCompetitionId();
 
         $this->competitionFour = new Competition("acting like jamie oliver", "do your best oliver impression",
-            DateHelper::datePlusDays(DateHelper::currentDate(), 1),
-            DateHelper::datePlusDays(DateHelper::currentDate(), 5),
-            2.99, 'Individual', 'Food');
+            DateHelper::datePlusDays(DateHelper::currentDate(), 2),
+            DateHelper::datePlusDays(DateHelper::currentDate(), 6),
+            1.99, 'Individual', 'Food');
         $this->dbConnection->insertCompetition($this->competitionFour);
         $this->competitionFourId = $this->dbConnection->mostRecentCompetitionId();
 
         $this->competitionFive = new Competition("acting like heidi klum", "do your best klum impression",
-            DateHelper::datePlusDays(DateHelper::currentDate(), 3),
-            DateHelper::datePlusDays(DateHelper::currentDate(), 7),
+            DateHelper::datePlusDays(DateHelper::currentDate(), 4),
+            DateHelper::datePlusDays(DateHelper::currentDate(), 8),
             2.99, 'Individual', 'Fashion');
         $this->dbConnection->insertCompetition($this->competitionFive);
         $this->competitionFiveId = $this->dbConnection->mostRecentCompetitionId();
 
         $this->competitionSix = new Competition("acting like arnold", "do your best arnold impression",
-            DateHelper::datePlusDays(DateHelper::currentDate(), 4),
-            DateHelper::datePlusDays(DateHelper::currentDate(), 8),
+            DateHelper::datePlusDays(DateHelper::currentDate(), 5),
+            DateHelper::datePlusDays(DateHelper::currentDate(), 9),
             2.99, 'Individual', 'Acting');
         $this->dbConnection->insertCompetition($this->competitionSix);
         $this->competitionSixId = $this->dbConnection->mostRecentCompetitionId();
 
         $this->competitionSeven = new Competition("acting", "do your best impression",
             DateHelper::datePlusDays(DateHelper::currentDate(), -5),
-            DateHelper::datePlusDays(DateHelper::currentDate(), -1),
+            DateHelper::datePlusDays(DateHelper::currentDate(), -2),
             2.99, 'Individual', 'Acting');
         $this->dbConnection->insertCompetition($this->competitionSeven);
         $this->competitionSevenId = $this->dbConnection->mostRecentCompetitionId();
@@ -138,6 +138,8 @@ class HomepageBuilderTest extends PHPUnit_Framework_TestCase{
         $homepageBuilder = new HomepageBuilder();
         $currentCompetitions = $homepageBuilder->loadCurrentCompetitions();
 
+        var_dump($currentCompetitions);
+
         $this->assertFalse(empty($currentCompetitions));
         $this->assertEquals(count($currentCompetitions), 3);
 
@@ -164,7 +166,31 @@ class HomepageBuilderTest extends PHPUnit_Framework_TestCase{
     }
 
     public function testLoadUpcomingCompetitions(){
-        $this->assertTrue(true);
+        $homepageBuilder = new HomepageBuilder();
+        $upcomingCompetitions = $homepageBuilder->loadUpcomingCompetitions();
+
+        var_dump($upcomingCompetitions);
+
+        $this->assertFalse(empty($upcomingCompetitions));
+        $this->assertEquals(count($upcomingCompetitions), 3);
+
+        $this->assertEquals($upcomingCompetitions[0]["title"], "acting like jamie oliver");
+        $this->assertEquals($upcomingCompetitions[0]["description"], "do your best oliver impression");
+        $this->assertEquals($upcomingCompetitions[0]["entry_fee"], 1.99);
+        $this->assertEquals($upcomingCompetitions[0]["type"], "Individual");
+        $this->assertEquals($upcomingCompetitions[0]["category"], "Food");
+
+        $this->assertEquals($upcomingCompetitions[1]["title"], "acting like heidi klum");
+        $this->assertEquals($upcomingCompetitions[1]["description"], "do your best klum impression");
+        $this->assertEquals($upcomingCompetitions[1]["entry_fee"], 2.99);
+        $this->assertEquals($upcomingCompetitions[1]["type"], "Individual");
+        $this->assertEquals($upcomingCompetitions[1]["category"], "Fashion");
+
+        $this->assertEquals($upcomingCompetitions[2]["title"], "acting like arnold");
+        $this->assertEquals($upcomingCompetitions[2]["description"], "do your best arnold impression");
+        $this->assertEquals($upcomingCompetitions[2]["entry_fee"], 2.99);
+        $this->assertEquals($upcomingCompetitions[2]["type"], "Individual");
+        $this->assertEquals($upcomingCompetitions[2]["category"], "Acting");
     }
 
     public function testLoadRecentWinners(){

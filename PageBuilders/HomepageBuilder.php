@@ -50,9 +50,8 @@ class HomepageBuilder{
     }
 
     public function loadUpcomingCompetitions(){
-        $today = DateHelper::currentDate();
-        $query = $this->getDBConnection()->prepare("select * from competition where start_date > $today
-                                                  order by start_date desc");
+        $query = $this->getDBConnection()->prepare("select * from competition where start_date > CURDATE()
+                                                  order by start_date asc");
         $query->execute();
         $query->store_result();
         $query->bind_result($id, $title, $description, $start_date, $end_date, $entry_fee, $comp_type, $category);
