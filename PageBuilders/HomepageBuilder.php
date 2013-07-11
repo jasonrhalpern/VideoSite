@@ -22,6 +22,11 @@ class HomepageBuilder{
         $this->recentWinners = $this->loadRecentWinners();
     }
 
+    /**
+     * Load the competitions that are currently ongoing
+     *
+     * @return array of competitions
+     */
     public function loadCurrentCompetitions(){
         $query = $this->getDBConnection()->prepare("select * from competition
                                                   where start_date <= CURDATE() and end_date >= CURDATE()
@@ -49,6 +54,11 @@ class HomepageBuilder{
         return $currentCompetitions;
     }
 
+    /**
+     * Load the competitions that will be starting soon
+     *
+     * @return array of competitions
+     */
     public function loadUpcomingCompetitions(){
         $query = $this->getDBConnection()->prepare("select * from competition where start_date > CURDATE()
                                                   order by start_date asc");
@@ -73,17 +83,23 @@ class HomepageBuilder{
         return $upcomingCompetitions;
     }
 
+    /**
+     * Load the winners of recent competitions
+     *
+     * @return array with the details of the winning videos
+     */
     public function loadRecentWinners(){
         $query = $this->getDBConnection()->prepare("select comp.id, comp.title, comp.category,
-                                                    v.video_id, v.title, v.likes, v.created_by, users.username
+                                                    v.video_id, v.title, v.likes, v.created_by, u.username
                                                     from competition comp, video v, competition_winner cw, users u
                                                     where comp.id = cw.competition_id
                                                     and cw.video_id = v.video_id
-                                                    and video.created_by = users.user_id");
+                                                    and v.created_by = u.user_id
+                                                    order by comp.end_date desc");
         $query->execute();
         $query->store_result();
         $query->bind_result($competitionId, $competitionTitle, $competitionCategory, $videoId, $videoTitle,
-                            $videoLikes, $videoCreatedBy);
+                            $videoLikes, $videoCreatedBy, $username);
         $count = 0;
         $recentWinners = array();
         while($query->fetch()){
@@ -95,6 +111,7 @@ class HomepageBuilder{
             $recentWinners[$count]["videoTitle"] = $videoTitle;
             $recentWinners[$count]["videoLikes"] = $videoLikes;
             $recentWinners[$count]["videoCreatedBy"] = $videoCreatedBy;
+            $recentWinners[$count]["username"] = $username;
             $count++;
         }
 

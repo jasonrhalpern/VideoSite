@@ -87,12 +87,13 @@ class HomepageBuilderTest extends PHPUnit_Framework_TestCase{
         $this->dbConnection->insertUser($this->userOne);
 
         $user = User::login($this->userOne->getEmail(), $this->userOne->getPassword());
+        $this->userOne = $user;
         $this->video = new Video('Hicks vss Gangstas booyah', 'battlezz of tha century', $user->getId());
         $this->dbConnection->insertVideo($this->video);
         $videoId = $this->dbConnection->mostRecentVideoId($user->getId());
         $this->video = Video::loadVideoById($videoId);
 
-        $this->dbConnection->insertCompetitionWinner(1, $videoId);
+        $this->dbConnection->insertCompetitionWinner(646, $videoId);
     }
 
     public function tearDown(){
@@ -103,7 +104,7 @@ class HomepageBuilderTest extends PHPUnit_Framework_TestCase{
         $this->dbConnection->deleteCompetition($this->competitionFiveId);
         $this->dbConnection->deleteCompetition($this->competitionSixId);
         $this->dbConnection->deleteCompetition($this->competitionSevenId);
-        $this->dbConnection->deleteCompetitionWinner(1, $this->video->getVideoId());
+        $this->dbConnection->deleteCompetitionWinner(646, $this->video->getVideoId());
         $this->dbConnection->deleteUser($this->userOne);
         $this->dbConnection->deleteVideo($this->video);
 
@@ -129,16 +130,9 @@ class HomepageBuilderTest extends PHPUnit_Framework_TestCase{
         unset($this->dbConnection);
     }
 
-    public function testBuildHomepage(){
-
-        $this->assertTrue(true);
-    }
-
     public function testLoadCurrentCompetitions(){
         $homepageBuilder = new HomepageBuilder();
         $currentCompetitions = $homepageBuilder->loadCurrentCompetitions();
-
-        var_dump($currentCompetitions);
 
         $this->assertFalse(empty($currentCompetitions));
         $this->assertEquals(count($currentCompetitions), 3);
@@ -169,8 +163,6 @@ class HomepageBuilderTest extends PHPUnit_Framework_TestCase{
         $homepageBuilder = new HomepageBuilder();
         $upcomingCompetitions = $homepageBuilder->loadUpcomingCompetitions();
 
-        var_dump($upcomingCompetitions);
-
         $this->assertFalse(empty($upcomingCompetitions));
         $this->assertEquals(count($upcomingCompetitions), 3);
 
@@ -194,6 +186,19 @@ class HomepageBuilderTest extends PHPUnit_Framework_TestCase{
     }
 
     public function testLoadRecentWinners(){
-        $this->assertTrue(true);
+        $homepageBuilder = new HomepageBuilder();
+        $recentWinners = $homepageBuilder->loadRecentWinners();
+
+        $this->assertFalse(empty($recentWinners));
+        $this->assertEquals(count($recentWinners), 1);
+
+        $this->assertEquals($recentWinners[0]["competitionId"], 646);
+        $this->assertEquals($recentWinners[0]["competitionTitle"], "acting like deniro");
+        $this->assertEquals($recentWinners[0]["competitionCategory"], "Acting");
+        $this->assertEquals($recentWinners[0]["videoId"], $this->video->getVideoId());
+        $this->assertEquals($recentWinners[0]["videoTitle"], "Hicks vss Gangstas booyah");
+        $this->assertEquals($recentWinners[0]["videoLikes"], 0);
+        $this->assertEquals($recentWinners[0]["videoCreatedBy"], $this->userOne->getId());
+        $this->assertEquals($recentWinners[0]["username"], "blah2394");
     }
 }
