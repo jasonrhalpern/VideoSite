@@ -112,4 +112,74 @@ class CompetitionPageBuilderTest extends PHPUnit_Framework_TestCase{
         $this->assertEquals($runnerUp["length"], $this->videoTwo->getLength());
         $this->assertEquals($runnerUp["likes"], $this->videoTwo->getLikes());
     }
+
+    public function loadParticipants(){
+
+        $user1 = new User('blahhhh', 'blaaaahhh@aol.com', 'blah2394', 1, 'blahhh');
+        $this->dbConnection->insertUser($user1);
+
+        $userOne = User::login($user1->getEmail(), $user1->getPassword());
+        $videoOne = new Video('Hicks vss Gangstas booyah', 'battlezz of tha century', $userOne->getId());
+        $this->dbConnection->insertVideo($videoOne);
+        $videoIdOne = $this->dbConnection->mostRecentVideoId($userOne->getId());
+        $videoOne = Video::loadVideoById($videoIdOne);
+        $videoOne->setLikes(3);
+
+        $this->dbConnection->insertCompetitionEntry(646, $videoIdOne);
+
+        $user2 = new User('blahhhh', 'blaaaahhh@aol.com', 'blah2394', 1, 'blahhh');
+        $this->dbConnection->insertUser($user2);
+
+        $userTwo = User::login($user2->getEmail(), $user2->getPassword());
+        $videoTwo = new Video('Hicks vss Gangstas booyah', 'battlezz of tha century', $userTwo->getId());
+        $this->dbConnection->insertVideo($videoTwo);
+        $videoIdTwo = $this->dbConnection->mostRecentVideoId($userTwo->getId());
+        $videoTwo = Video::loadVideoById($videoIdTwo);
+        $videoTwo->setLikes(2);
+
+        $this->dbConnection->insertCompetitionEntry(646, $videoIdTwo);
+
+        $user3 = new User('blahhhh', 'blaaaahhh@aol.com', 'blah2394', 1, 'blahhh');
+        $this->dbConnection->insertUser($user3);
+
+        $userThree = User::login($user3->getEmail(), $user3->getPassword());
+        $videoThree = new Video('Hicks vss Gangstas booyah', 'battlezz of tha century', $userThree->getId());
+        $this->dbConnection->insertVideo($videoThree);
+        $videoIdThree = $this->dbConnection->mostRecentVideoId($userThree->getId());
+        $videoThree = Video::loadVideoById($videoIdThree);
+        $videoThree->setLikes(1);
+
+        $this->dbConnection->insertCompetitionEntry(646, $videoIdThree);
+
+        $user4 = new User('blahhhh', 'blaaaahhh@aol.com', 'blah2394', 1, 'blahhh');
+        $this->dbConnection->insertUser($user4);
+
+        $userFour = User::login($user4->getEmail(), $user4->getPassword());
+        $videoFour = new Video('Hicks vss Gangstas booyah', 'battlezz of tha century', $userFour->getId());
+        $this->dbConnection->insertVideo($videoFour);
+        $videoIdFour = $this->dbConnection->mostRecentVideoId($userFour->getId());
+        $videoFour = Video::loadVideoById($videoIdFour);
+        $videoFour->setLikes(1);
+
+        $this->dbConnection->insertCompetitionEntry(646, $videoIdFour);
+
+        $this->assertEquals(true);
+
+        $this->dbConnection->deleteCompetitionEntry(646, $videoIdOne);
+        $this->dbConnection->deleteUser($userOne);
+        $this->dbConnection->deleteVideo($videoOne);
+
+        $this->dbConnection->deleteCompetitionEntry(646, $videoIdTwo);
+        $this->dbConnection->deleteUser($userTwo);
+        $this->dbConnection->deleteVideo($videoTwo);
+
+        $this->dbConnection->deleteCompetitionEntry(646, $videoIdThree);
+        $this->dbConnection->deleteUser($userThree);
+        $this->dbConnection->deleteVideo($videoThree);
+
+        $this->dbConnection->deleteCompetitionEntry(646, $videoIdFour);
+        $this->dbConnection->deleteUser($userFour);
+        $this->dbConnection->deleteVideo($videoFour);
+
+    }
 }

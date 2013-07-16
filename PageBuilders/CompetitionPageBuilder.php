@@ -27,8 +27,7 @@ class CompetitionPageBuilder{
         $this->determineState();
         $this->winner = $this->loadWinner();
         $this->runnerUp = $this->loadRunnerUp();
-        $this->finalists = $this->loadFinalists();
-        $this->otherParticipants = $this->loadOtherParticipants();
+        $this->loadParticipants();
     }
 
     /**
@@ -112,12 +111,36 @@ class CompetitionPageBuilder{
 
     }
 
-    public function loadFinalists(){
-
-    }
-
-    public function loadOtherParticipants(){
-
+    public function loadParticipants(){
+        $query = $this->getDBConnection()->prepare("select v.video_id, v.title, v.description, v.created,
+                                                    v.views, v.video_length, v.likes, u.username
+                                                    from competition comp, competition_entries ce, video v, users u
+                                                    where comp.id = ? and comp.id = ce.competition_id
+                                                    and ce.video_id = v.video_id
+                                                    and v.created_by = u.user_id
+                                                    order by v.likes desc");
+        $query->bind_param("i", $this->competitionId);
+        $query->execute();
+        $query->store_result();
+        $query->bind_result($videoId,  $title, $description, $created, $views, $length, $likes, $username);
+        $count = 0;
+        $participants = array();
+        while($query->fetch()){
+            $participants[$count]["id"] = $videoId;
+            $participants[$count]["title"] = $title;
+            $participants[$count]["description"] = $description;
+            $participants[$count]["created"] = $created;
+            $participants[$count]["user"] = $username;
+            $participants[$count]["views"] = $views;
+            $participants[$count]["length"] = $length;
+            $participants[$count]["likes"] = $likes;
+            if($count >= 2 && $count <=7){
+                $this->finalists[] = $participants[$count];
+            } else if($count > 7) {
+                $this->otherParticipants[] = $participants[$count];
+            }
+            $count++;
+        }
     }
 
     public function determineState(){
