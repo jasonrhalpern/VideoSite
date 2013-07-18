@@ -113,17 +113,17 @@ class CompetitionPageBuilderTest extends PHPUnit_Framework_TestCase{
         $this->assertEquals($runnerUp["likes"], $this->videoTwo->getLikes());
     }
 
-    public function loadParticipants(){
+    public function testLoadParticipants(){
 
         $user1 = new User('blahhhh', 'blaaaahhh@aol.com', 'blah2394', 1, 'blahhh');
         $this->dbConnection->insertUser($user1);
 
         $userOne = User::login($user1->getEmail(), $user1->getPassword());
         $videoOne = new Video('Hicks vss Gangstas booyah', 'battlezz of tha century', $userOne->getId());
+        $videoOne->setLikes(4);
         $this->dbConnection->insertVideo($videoOne);
         $videoIdOne = $this->dbConnection->mostRecentVideoId($userOne->getId());
         $videoOne = Video::loadVideoById($videoIdOne);
-        $videoOne->setLikes(3);
 
         $this->dbConnection->insertCompetitionEntry(646, $videoIdOne);
 
@@ -132,10 +132,10 @@ class CompetitionPageBuilderTest extends PHPUnit_Framework_TestCase{
 
         $userTwo = User::login($user2->getEmail(), $user2->getPassword());
         $videoTwo = new Video('Hicks vss Gangstas booyah', 'battlezz of tha century', $userTwo->getId());
+        $videoTwo->setLikes(3);
         $this->dbConnection->insertVideo($videoTwo);
         $videoIdTwo = $this->dbConnection->mostRecentVideoId($userTwo->getId());
         $videoTwo = Video::loadVideoById($videoIdTwo);
-        $videoTwo->setLikes(2);
 
         $this->dbConnection->insertCompetitionEntry(646, $videoIdTwo);
 
@@ -144,10 +144,10 @@ class CompetitionPageBuilderTest extends PHPUnit_Framework_TestCase{
 
         $userThree = User::login($user3->getEmail(), $user3->getPassword());
         $videoThree = new Video('Hicks vss Gangstas booyah', 'battlezz of tha century', $userThree->getId());
+        $videoThree->setLikes(2);
         $this->dbConnection->insertVideo($videoThree);
         $videoIdThree = $this->dbConnection->mostRecentVideoId($userThree->getId());
         $videoThree = Video::loadVideoById($videoIdThree);
-        $videoThree->setLikes(1);
 
         $this->dbConnection->insertCompetitionEntry(646, $videoIdThree);
 
@@ -156,14 +156,38 @@ class CompetitionPageBuilderTest extends PHPUnit_Framework_TestCase{
 
         $userFour = User::login($user4->getEmail(), $user4->getPassword());
         $videoFour = new Video('Hicks vss Gangstas booyah', 'battlezz of tha century', $userFour->getId());
+        $videoFour->setLikes(1);
         $this->dbConnection->insertVideo($videoFour);
         $videoIdFour = $this->dbConnection->mostRecentVideoId($userFour->getId());
         $videoFour = Video::loadVideoById($videoIdFour);
-        $videoFour->setLikes(1);
 
         $this->dbConnection->insertCompetitionEntry(646, $videoIdFour);
 
-        $this->assertEquals(true);
+        $competitionPageBuilder = new CompetitionPageBuilder(646);
+        $competitionPageBuilder->loadParticipants();
+
+        $finalists = $competitionPageBuilder->getFinalists();
+        $this->assertFalse(empty($finalists));
+        $this->assertEquals(count($finalists), 2);
+
+        $otherParticipants = $competitionPageBuilder->getOtherParticipants();
+        $this->assertTrue(empty($otherParticipants));
+
+        $this->assertEquals($finalists[0]["id"], $videoIdThree);
+        $this->assertEquals($finalists[0]["title"],'Hicks vss Gangstas booyah');
+        $this->assertEquals($finalists[0]["description"], 'battlezz of tha century');
+        $this->assertEquals($finalists[0]["user"], $user3->getUsername());
+        $this->assertEquals($finalists[0]["views"], 0);
+        $this->assertEquals($finalists[0]["length"], 0);
+        $this->assertEquals($finalists[0]["likes"], 2);
+
+        $this->assertEquals($finalists[1]["id"], $videoIdFour);
+        $this->assertEquals($finalists[1]["title"],'Hicks vss Gangstas booyah');
+        $this->assertEquals($finalists[1]["description"], 'battlezz of tha century');
+        $this->assertEquals($finalists[1]["user"], $user4->getUsername());
+        $this->assertEquals($finalists[1]["views"], 0);
+        $this->assertEquals($finalists[1]["length"], 0);
+        $this->assertEquals($finalists[1]["likes"], 1);
 
         $this->dbConnection->deleteCompetitionEntry(646, $videoIdOne);
         $this->dbConnection->deleteUser($userOne);
