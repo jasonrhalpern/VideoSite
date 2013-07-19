@@ -24,7 +24,7 @@ class CompetitionPageBuilder{
 
     public function buildCompetitionPage(){
         $this->competition = $this->loadCompetition();
-        $this->determineState();
+        $this->determineState($this->competition->getStartDate(), $this->competition->getEndDate());
         $this->winner = $this->loadWinner();
         $this->runnerUp = $this->loadRunnerUp();
         $this->loadParticipants();
@@ -143,7 +143,19 @@ class CompetitionPageBuilder{
         }
     }
 
-    public function determineState(){
+    public function determineState($startDate, $endDate){
+        $currentDate = strtotime(DateHelper::currentDate());
+        $startDate = strtotime($startDate);
+        $endDate = strtotime($endDate);
+
+        if($currentDate > $endDate)
+            $this->setState('closed');
+
+        if($currentDate <= $endDate && $currentDate >= $startDate )
+            $this->setState('current');
+
+        if($currentDate < $startDate)
+            $this->setState('upcoming');
 
     }
 

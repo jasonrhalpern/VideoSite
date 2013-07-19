@@ -206,4 +206,28 @@ class CompetitionPageBuilderTest extends PHPUnit_Framework_TestCase{
         $this->dbConnection->deleteVideo($videoFour);
 
     }
+
+    public function testDetermineState(){
+
+        $competitionPageBuilder = new CompetitionPageBuilder(646);
+        $currentDate = DateHelper::currentDate();
+
+        $startDateOne = DateHelper::datePlusDays($currentDate, -4);
+        $endDateOne = DateHelper::datePlusDays($currentDate, -1);
+        $competitionPageBuilder->determineState($startDateOne, $endDateOne);
+        $stateOne = $competitionPageBuilder->getState();
+        $this->assertEquals($stateOne, 'closed');
+
+        $startDateTwo = DateHelper::datePlusDays($currentDate, -2);
+        $endDateTwo = DateHelper::datePlusDays($currentDate, 1);
+        $competitionPageBuilder->determineState($startDateTwo, $endDateTwo);
+        $stateTwo = $competitionPageBuilder->getState();
+        $this->assertEquals($stateTwo, 'current');
+
+        $startDateThree = DateHelper::datePlusDays($currentDate, 1);
+        $endDateThree = DateHelper::datePlusDays($currentDate, 4);
+        $competitionPageBuilder->determineState($startDateThree, $endDateThree);
+        $stateThree = $competitionPageBuilder->getState();
+        $this->assertEquals($stateThree, 'upcoming');
+    }
 }
