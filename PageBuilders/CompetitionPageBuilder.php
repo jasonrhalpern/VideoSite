@@ -58,6 +58,11 @@ class CompetitionPageBuilder{
         return $competition;
     }
 
+    /**
+     * Load the winner's details for this page
+     *
+     * @return array with the winner's details
+     */
     public function loadWinner(){
         $query = $this->getDBConnection()->prepare("select v.video_id, v.title, v.description, v.created,
                                                     v.views, v.video_length, v.likes, u.username
@@ -84,6 +89,11 @@ class CompetitionPageBuilder{
         return $winner;
     }
 
+    /**
+     * Load the runner up's details for this page
+     *
+     * @return array with the runner up's details
+     */
     public function loadRunnerUp(){
         $query = $this->getDBConnection()->prepare("select v.video_id, v.title, v.description, v.created,
                                                     v.views, v.video_length, v.likes, u.username
@@ -111,6 +121,11 @@ class CompetitionPageBuilder{
 
     }
 
+    /**
+     * Load the all the participants for this page
+     *
+     * @return array with the participants' details
+     */
     public function loadParticipants(){
         $query = $this->getDBConnection()->prepare("select v.video_id, v.title, v.description, v.created,
                                                     v.views, v.video_length, v.likes, u.username
@@ -143,6 +158,11 @@ class CompetitionPageBuilder{
         }
     }
 
+    /**
+     * Determine the state of this competition
+     *
+     * @return string The state of the competition
+     */
     public function determineState($startDate, $endDate){
         $currentDate = strtotime(DateHelper::currentDate());
         $startDate = strtotime($startDate);
