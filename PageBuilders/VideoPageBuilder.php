@@ -3,7 +3,7 @@
 class VideoPageBuilder{
 
     protected $videoId;
-    protected $videoPage;//array, not actually a video object
+    protected $videoWindow;//array, not actually a video object
     protected $comments;
     protected $otherVideosInCompetition;
     protected $db;
@@ -14,14 +14,14 @@ class VideoPageBuilder{
     }
 
     public function buildCompetitionPage(){
-        $this->videoPage = $this->loadVideoPage();
+        $this->videoWindow = $this->loadVideoWindow();
         $this->comments = $this->loadComments();
         $this->otherVideosInCompetition = $this->loadOtherVideosInCompetition($competitionId);
     }
 
-    public function loadVideoPage(){
+    public function loadVideoWindow(){
         $query = $this->getDBConnection()->prepare("select video_details.video_id, competition_id, video_details.title,
-                                                    video_details.description, user_id, video_details.created, video_details.created_by,
+                                                    video_details.description, user_id, video_details.created,
                                                     video_details.video_length, video_details.likes,
                                                     username, comp.title, comp.description, comp.comp_type, comp.category,
                                                     comp.start_date, comp.end_date
@@ -34,11 +34,29 @@ class VideoPageBuilder{
         $query->bind_param("i", $this->videoId);
         $query->execute();
         $query->store_result();
-        $query->bind_result();
-        $video = array();
+        $query->bind_result($videoId, $competitionId, $videoTitle, $videoDescription, $userId, $createdDate, $videoLength, $votes,
+                            $username, $competitionTitle, $competitionDescription, $competitionType, $category, $competitionStartDate,
+                            $competitionEndDate);
+        $videoWindow = array();
         if($query->fetch()){
-
+            $videoWindow["videoId"] = $videoId;
+            $videoWindow["competitionId"] = $competitionId;
+            $videoWindow["videoTitle"] = $videoTitle;
+            $videoWindow["videoDescription"] = $videoDescription;
+            $videoWindow["userId"] = $userId;
+            $videoWindow["createdDate"] = $createdDate;
+            $videoWindow["videoLength"] = $videoLength;
+            $videoWindow["votes"] = $votes;
+            $videoWindow["username"] = $username;
+            $videoWindow["competitionTitle"] = $competitionTitle;
+            $videoWindow["competitionDescription"] = $competitionDescription;
+            $videoWindow["competitionType"] = $competitionType;
+            $videoWindow["category"] = $category;
+            $videoWindow["competitionStartDate"] = $competitionStartDate;
+            $videoWindow["competitionEndDate"] = $competitionEndDate;
         }
+
+        return $videoWindow;
     }
 
     public function loadComments(){
@@ -47,6 +65,13 @@ class VideoPageBuilder{
 
     public function loadOtherVideosInCompetition($competitionId){
 
+    }
+
+    /**
+     * @return mysqli The database handle
+     */
+    public function getDBConnection(){
+        return $this->db->getDBConnection();
     }
 }
 
