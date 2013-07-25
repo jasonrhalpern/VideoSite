@@ -16,7 +16,7 @@ class VideoPageBuilder{
     public function buildCompetitionPage(){
         $this->videoWindow = $this->loadVideoWindow();
         $this->comments = $this->loadComments();
-        $this->otherVideosInCompetition = $this->loadOtherVideosInCompetition($competitionId);
+        $this->otherVideosInCompetition = $this->loadOtherVideosInCompetition();
     }
 
     public function loadVideoWindow(){
@@ -60,11 +60,50 @@ class VideoPageBuilder{
     }
 
     public function loadComments(){
+        $query = $this->getDBConnection()->prepare("select * from comments where production_id = ? order by posted desc");
+        $query->bind_param("i", $this->videoWindow["competitionId"]);
+        $query->execute();
+        $query->store_result();
+        $query->bind_result($comment_id, $production_id, $username, $comment_text, $posted);
+        $comments = array();
+        while($query->fetch()){
+            $comments["comment_id"] = $comment_id;
+            $comments["production_id"] = $production_id;
+            $comments["username"] = $username;
+            $comments["comment_text"] = $comment_text;
+            $comments["posted"] = $posted;
+        }
 
+        return $comments;
     }
 
-    public function loadOtherVideosInCompetition($competitionId){
+    public function loadOtherVideosInCompetition(){
+        $query = $this->getDBConnection()->prepare("select v.video_id, v.title, v.description, v.created,
+                                                    v.views, v.video_length, v.likes, u.username
+                                                    from competition comp, competition_entries ce, video v, users u
+                                                    where comp.id = ? and comp.id = ce.competition_id
+                                                    and ce.video_id = v.video_id
+                                                    and v.created_by = u.user_id");
+        $query->bind_param("i", $this->videoWindow["competitionId"]);
+        $query->execute();
+        $query->store_result();
+        $query->bind_result($videoId,  $title, $description, $created, $views, $length, $likes, $username);
+        $count = 0;
+        $participants = array();
+        while($query->fetch()){
+            $participants[$count]["id"] = $videoId;
+            $participants[$count]["title"] = $title;
+            $participants[$count]["description"] = $description;
+            $participants[$count]["created"] = $created;
+            $participants[$count]["user"] = $username;
+            $participants[$count]["views"] = $views;
+            $participants[$count]["length"] = $length;
+            $participants[$count]["likes"] = $likes;
+            //do whatever here
+            $count++;
+        }
 
+        return $participants;
     }
 
     /**
