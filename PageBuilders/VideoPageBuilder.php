@@ -5,18 +5,19 @@ class VideoPageBuilder{
     protected $videoId;
     protected $videoWindow;//array, not actually a video object
     protected $comments;
-    protected $otherVideosInCompetition;
+    protected $otherVideosInCompetitionSidebar;
     protected $db;
+    const MAXIMUM_SIDEBAR_SIZE = 10;
 
     public function __construct($videoId){
         $this->videoId = $videoId;
         $this->db = new MySQL();
     }
 
-    public function buildCompetitionPage(){
+    public function buildVideoPage(){
         $this->videoWindow = $this->loadVideoWindow();
         $this->comments = $this->loadComments();
-        $this->otherVideosInCompetition = $this->loadOtherVideosInCompetition();
+        $this->otherVideosInCompetitionSidebar = $this->loadOtherVideosInCompetitionSidebar();
     }
 
     public function loadVideoWindow(){
@@ -77,7 +78,29 @@ class VideoPageBuilder{
         return $comments;
     }
 
-    public function loadOtherVideosInCompetition(){
+    public function loadOtherVideosInCompetitionSidebar(){
+        $allParticipants = $this->getAllParticipantsInCompetition();
+        $numberOfParticipants = count($allParticipants);
+        $maxIndex = $numberOfParticipants - 1;
+
+        $participantsIndex = 0;
+        if($numberOfParticipants > self::MAXIMUM_SIDEBAR_SIZE){
+            $participantsIndex = rand(0, $maxIndex);
+        }
+
+        $otherVideosInCompetition = array();
+        for ($i = 0; $i < self::MAXIMUM_SIDEBAR_SIZE; $i++) {
+            if($participantsIndex > $maxIndex){
+                $participantsIndex = 0;
+            }
+            $otherVideosInCompetition[$i] = $allParticipants[$participantsIndex];
+            $participantsIndex++;
+        }
+
+        return $otherVideosInCompetition;
+    }
+
+    private function getAllParticipantsInCompetition(){
         $query = $this->getDBConnection()->prepare("select v.video_id, v.title, v.description, v.created,
                                                     v.views, v.video_length, v.likes, u.username
                                                     from competition comp, competition_entries ce, video v, users u
@@ -104,6 +127,22 @@ class VideoPageBuilder{
         }
 
         return $participants;
+    }
+
+    public function getVideoId(){
+        return $this->videoId;
+    }
+
+    public function getVideoWindow(){
+        return $this->videoWindow;
+    }
+
+    public function getComments(){
+        return $this->comments;
+    }
+
+    public function getOtherVideosInCompetitionSidebar(){
+        return $this->otherVideosInCompetitionSidebar;
     }
 
     /**

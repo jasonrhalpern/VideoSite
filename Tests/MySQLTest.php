@@ -28,7 +28,7 @@ class MySQLTest extends PHPUnit_Framework_TestCase{
                                             DateHelper::datePlusDays(DateHelper::currentDate(), 2),
                                             DateHelper::datePlusDays(DateHelper::currentDate(), 7),
                                             2.99, 'Individual', 'Acting');
-        $this->comment = new Comment(1, 'Daisies Egg', 'Comment text', DateHelper::currentDateAndTime());
+        $this->comment = new Comment(1, 'Daisies Egg', 'Comment text');
         $this->dbConnection = new MySQL();
     }
 

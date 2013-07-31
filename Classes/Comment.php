@@ -13,7 +13,7 @@ class Comment{
     protected $text;
     protected $posted; //datetime
 
-    public function __construct($productionId, $username, $text, $posted){
+    public function __construct($productionId, $username, $text){
 
         $this->productionId = $productionId;
         $this->username = $username;
