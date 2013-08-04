@@ -46,6 +46,7 @@ class VideoPageBuilderTest extends PHPUnit_Framework_TestCase{
         $this->videoTwo = Video::loadVideoById($videoId);
 
         $this->dbConnection->insertCompetitionEntry(646, $videoId);
+
     }
 
     public function tearDown(){
@@ -68,23 +69,58 @@ class VideoPageBuilderTest extends PHPUnit_Framework_TestCase{
     public function testLoadVideoWindow(){
         $videoPageBuilder = new VideoPageBuilder($this->videoOne->getVideoId());
         $videoWindow = $videoPageBuilder->loadVideoWindow();
-        $this->assertTrue(true);
+
+        $this->assertEquals($videoWindow["videoId"], $this->videoOne->getVideoId());
+        $this->assertEquals($videoWindow["competitionId"], 646);
+        $this->assertEquals($videoWindow["videoTitle"], $this->videoOne->getTitle());
+        $this->assertEquals($videoWindow["videoDescription"], $this->videoOne->getDescription());
+        $this->assertEquals($videoWindow["userId"], $this->userOne->getId());
+        $this->assertEquals($videoWindow["createdDate"], $this->videoOne->getPostedDate());
+        $this->assertEquals($videoWindow["videoLength"], $this->videoOne->getLength());
+        $this->assertEquals($videoWindow["votes"], $this->videoOne->getLikes());
+        $this->assertEquals($videoWindow["username"], $this->userOne->getUsername());
+        $this->assertEquals($videoWindow["competitionTitle"], 'acting like deniro');
+        $this->assertEquals($videoWindow["competitionDescription"], 'do your best deniro impression');
+        $this->assertEquals($videoWindow["competitionType"], 'Individual');
+        $this->assertEquals($videoWindow["category"], 'Acting');
+        $this->assertEquals($videoWindow["competitionStartDate"], '2013-06-20');
+        $this->assertEquals($videoWindow["competitionEndDate"], '2013-06-24');
 
     }
 
     public function testLoadComments(){
+        $this->comment = new Comment($this->videoOne->getVideoId(), $this->userOne->getUsername(), 'This vid sucks');
+        $this->dbConnection->insertComment($this->comment);
+
         $videoPageBuilder = new VideoPageBuilder($this->videoOne->getVideoId());
         $comments = $videoPageBuilder->loadComments();
-        $this->assertTrue(true);
 
+        $this->assertEquals($comments[0]["production_id"], $this->videoOne->getVideoId());
+        $this->assertEquals($comments[0]["username"], $this->userOne->getUsername());
+        $this->assertEquals($comments[0]["comment_text"], 'This vid sucks');
+
+        $this->assertTrue(empty($comments[1]));
+
+
+        $this->dbConnection->deleteComment($comments[0]["comment_id"]);
+        unset($this->comment);
     }
 
     public function testLoadOtherVideosInCompetitionSidebar(){
         $videoPageBuilder = new VideoPageBuilder($this->videoOne->getVideoId());
         $videoPageBuilder->buildVideoPage();
-        $otherVideos = $videoPageBuilder->getOtherVideosInCompetitionSidebar();
-        $this->assertTrue(true);
+        $participants = $videoPageBuilder->getOtherVideosInCompetitionSidebar();
 
+        $this->assertEquals($participants[0]["id"], $this->videoTwo->getVideoId());
+        $this->assertEquals($participants[0]["title"], $this->videoTwo->getTitle());
+        $this->assertEquals($participants[0]["description"], $this->videoTwo->getDescription());
+        $this->assertEquals($participants[0]["created"], $this->videoTwo->getPostedDate());
+        $this->assertEquals($participants[0]["user"], $this->userTwo->getUsername());
+        $this->assertEquals($participants[0]["views"], $this->videoTwo->getViews());
+        $this->assertEquals($participants[0]["length"], $this->videoTwo->getLength());
+        $this->assertEquals($participants[0]["votes"], $this->videoTwo->getLikes());
+
+        $this->assertTrue(empty($participants[1]));
     }
 }
 

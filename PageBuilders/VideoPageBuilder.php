@@ -62,17 +62,19 @@ class VideoPageBuilder{
 
     public function loadComments(){
         $query = $this->getDBConnection()->prepare("select * from comments where production_id = ? order by posted desc");
-        $query->bind_param("i", $this->videoWindow["competitionId"]);
+        $query->bind_param("i", $this->videoId);
         $query->execute();
         $query->store_result();
         $query->bind_result($comment_id, $production_id, $username, $comment_text, $posted);
         $comments = array();
+        $count = 0;
         while($query->fetch()){
-            $comments["comment_id"] = $comment_id;
-            $comments["production_id"] = $production_id;
-            $comments["username"] = $username;
-            $comments["comment_text"] = $comment_text;
-            $comments["posted"] = $posted;
+            $comments[$count]["comment_id"] = $comment_id;
+            $comments[$count]["production_id"] = $production_id;
+            $comments[$count]["username"] = $username;
+            $comments[$count]["comment_text"] = $comment_text;
+            $comments[$count]["posted"] = $posted;
+            $count++;
         }
 
         return $comments;
@@ -87,14 +89,27 @@ class VideoPageBuilder{
         if($numberOfParticipants > self::MAXIMUM_SIDEBAR_SIZE){
             $participantsIndex = rand(0, $maxIndex);
         }
+        $startingIndex = $participantsIndex;
 
         $otherVideosInCompetition = array();
-        for ($i = 0; $i < self::MAXIMUM_SIDEBAR_SIZE; $i++) {
+        $i = 0;
+        while ($i < self::MAXIMUM_SIDEBAR_SIZE) {
+
             if($participantsIndex > $maxIndex){
                 $participantsIndex = 0;
+                if($participantsIndex == $startingIndex){
+                    break;
+                }
             }
-            $otherVideosInCompetition[$i] = $allParticipants[$participantsIndex];
+
+            if($allParticipants[$participantsIndex]["id"] != $this->videoId){
+                $otherVideosInCompetition[$i] = $allParticipants[$participantsIndex];
+                $i++;
+            }
             $participantsIndex++;
+            if($participantsIndex == $startingIndex){
+                break;
+            }
         }
 
         return $otherVideosInCompetition;
@@ -121,7 +136,7 @@ class VideoPageBuilder{
             $participants[$count]["user"] = $username;
             $participants[$count]["views"] = $views;
             $participants[$count]["length"] = $length;
-            $participants[$count]["likes"] = $likes;
+            $participants[$count]["votes"] = $likes;
             //do whatever here
             $count++;
         }
